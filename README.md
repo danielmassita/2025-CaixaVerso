@@ -11,6 +11,7 @@
 
 # Teste de Aptidão:
 
+```
 ✅ - Eu sei escrever queries SQL para recuperar, manipular (INSERT INSERT, ,  UPDATE UPDATE, ,  DELETE DELETE) e combinar dados de múltiplas tabelas usando JOINs.
 
 ✅ - Eu compreendo e utilizo funções agregadas (SUM SUM, ,  AVG AVG, ,  COUNT COUNT) e técnicas de otimização para melhorar o desempenho de queries.
@@ -102,7 +103,7 @@
 ❌ - Eu sei construir e avaliar árvores de decisão e aplicar métodos de ensemble como Random Forest e bagging.
 
 ❌ - Eu compreendo e sei aplicar métodos de boosting como AdaBoost e Gradient Boosting para otimizar modelos.
-
+```
 
 # Cursos
 
