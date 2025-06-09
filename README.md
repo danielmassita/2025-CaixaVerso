@@ -1,6 +1,8 @@
 # CAIXAVERSO 
 `https://caixaverso.ada.tech/`
 
+![Copilot_20250609_000553](https://github.com/user-attachments/assets/a06d9611-77d7-4880-a447-3cf902c95c2f)
+
 
 ## Trilha de Estudo
 ## Analista de Dados | Nível I
