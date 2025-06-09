@@ -13,13 +13,9 @@
 
 ```
 ✅ - Eu sei escrever queries SQL para recuperar, manipular (INSERT INSERT, ,  UPDATE UPDATE, ,  DELETE DELETE) e combinar dados de múltiplas tabelas usando JOINs.
-
 ✅ - Eu compreendo e utilizo funções agregadas (SUM SUM, ,  AVG AVG, ,  COUNT COUNT) e técnicas de otimização para melhorar o desempenho de queries.
-
 ❌ - Eu sei criar e modificar estruturas de banco de dados utilizando comandos DDL (CREATE, ALTER, DROP).
-
 ❌ - Eu compreendo os conceitos de modelagem entidade-relacionamento e sei criar e interpretar modelos físicos de banco de dados.
-
 ❌ - Eu consigo manipular dados no SQL, incluindo tratamento de datas e textos para extrair informações úteis.
 
 ❌ - Eu sei conectar o Power BI a diferentes fontes de dados, como Excel e SQL, e carregar dados corretamente.
