@@ -15,5 +15,5 @@
 - Professor: (Tiago Marto)[https://www.linkedin.com/in/tiagomarto/]
   - Desenvolvedor Full Stack
   - Data Scientist
-
- - 
+- Software: [PostgresSQL](https://www.enterprisedb.com/postgresql-tutorial-resources-training-1?uuid=140fdf8e-34e6-4b1b-ac32-532e5ac826c4&campaignId=Product_Trial_PostgreSQL_14) v.14.18 (stable)
+- Banco de Dados: Exemplo [Northwind](https://operational-production.s3.sa-east-1.amazonaws.com/Materiais+extras+-+cursos+digitais/Introdu%C3%A7%C3%A3o+a+SQL+e+Power+BI/northwind+(1).sql)
