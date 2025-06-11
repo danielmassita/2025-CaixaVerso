@@ -42,4 +42,4 @@ ___
   - ```sql
     SELECT * FROM categories
     ```
-  - 
+  - A "query" é o comando que se dá pro BD retornar a "query" com as informações... 
