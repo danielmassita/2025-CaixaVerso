@@ -25,6 +25,29 @@ ___
 - Postgres SQL -> Generate ERD
 - ![image](https://github.com/user-attachments/assets/a6da2490-7e45-44d3-b879-184b040f2fca)
 
+- pgAdmin4.exe
+- Servers > PostgreSQL 14 > Databases > postgres > Query Tool (Alt + Shift + Q)
+- ![image](https://github.com/user-attachments/assets/3377c4da-3f1c-46d0-bb1a-f4240f4b7143)
+- Janela em branco para escrever o código...
+- Open File (Ctrl + O) - Carregar a Base (Northwind.sql)...
+- Selecionar TODA A BASE (Ctrl + A)...
+- Executar Script (F5)...
+- ![image](https://github.com/user-attachments/assets/198c3dc2-e856-4b12-8760-2b8ac17543c9)
+- Schemas > Public > Tables Refresh
+- ![image](https://github.com/user-attachments/assets/788d0326-2706-44e2-a958-06a2c3db4656)
+- ```sql
+  SELECT * FROM categories
+  ```
+- Menu: Databases > Postgres > ERD For Databases
+- ![image](https://github.com/user-attachments/assets/35dd6021-8530-4c5d-a3f6-423af87145f8)
+- ![image](https://github.com/user-attachments/assets/39072ecf-9f67-4137-b39f-107684bcae26)
+- 
+
+
+
+
+
+
 ___
 
 ## Aula 2 - Queries Simples
