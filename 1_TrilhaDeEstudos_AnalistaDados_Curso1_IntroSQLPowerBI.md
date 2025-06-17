@@ -22,9 +22,6 @@ ___
 - Software: [PostgresSQL](https://www.enterprisedb.com/postgresql-tutorial-resources-training-1?uuid=140fdf8e-34e6-4b1b-ac32-532e5ac826c4&campaignId=Product_Trial_PostgreSQL_14) v.14.18 (stable)
 - Banco de Dados: Exemplo [Northwind](https://operational-production.s3.sa-east-1.amazonaws.com/Materiais+extras+-+cursos+digitais/Introdu%C3%A7%C3%A3o+a+SQL+e+Power+BI/northwind+(1).sql)
 
-- Postgres SQL -> Generate ERD
-- ![image](https://github.com/user-attachments/assets/a6da2490-7e45-44d3-b879-184b040f2fca)
-
 - pgAdmin4.exe
 - Servers > PostgreSQL 14 > Databases > postgres > Query Tool (Alt + Shift + Q)
 - ![image](https://github.com/user-attachments/assets/3377c4da-3f1c-46d0-bb1a-f4240f4b7143)
@@ -41,8 +38,8 @@ ___
 - Menu: Databases > Postgres > ERD For Databases
 - ![image](https://github.com/user-attachments/assets/35dd6021-8530-4c5d-a3f6-423af87145f8)
 - ![image](https://github.com/user-attachments/assets/39072ecf-9f67-4137-b39f-107684bcae26)
-- 
-
+  - Como as tabelas se relacionam (consumidor, produtos, funcionário, fornecedores etc.)
+  - Base que vamos utilizar para montar os exemplos...
 
 
 
