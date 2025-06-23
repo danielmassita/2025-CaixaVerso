@@ -49,17 +49,72 @@ ___
 
 ## Aula 2 - Queries Simples
 
+- Query = Pergunta, Dúvida, Questionamento. (T.I.) = Consulta/Busca informação específica no BD.
 - Consultas simples no banco de dados (DB).
 - Boas práticas e consultas simples para negócios.
 - Pergunta em frente ao Northwind:
   - Quais as categorias de produtos que eu tenho nesse BD?
   - Usar "bons nomes" para as tabelas facilita o trabalho.
+  - Algumas "tables" são intuitivas, mas usar nomes e rótulos ajudam ao não-técnico a entender a Informação oriunda do Dado.
 
 - **SELECT**
+  - Abrir o SQL -> PgAdmin.exe -> Query Tool (Alt+Shift+Q) -> Tables
   - Usamos o SELECT quando queremos consultar alguma coisa...
   - Usamos o * quando queremos consultar "tudo" sobre algo...
   - Do quê? Da tabela "categories"...
   - ```sql
     SELECT * FROM categories
     ```
-  - A "query" é o comando que se dá pro BD retornar a "query" com as informações... 
+    ![image](https://github.com/user-attachments/assets/5b87aca1-40cd-4822-ac05-98cb3ed232fb)
+
+  - A "query" é o comando que se dá pro BD retornar a "query" com as informações.
+  - Se a tabela tiver centenas/milhares/milhões de linhas, vale a pena lembrar do CUSTO por causa da Nuvem.
+  - ![image](https://github.com/user-attachments/assets/081eb2c7-e630-4d57-843c-c9cbd2b0958d)
+  - Boa prática: comando de LIMIT.
+  - ```sql
+    SELECT * FROM orders
+    LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/07cf8fec-ffea-4dba-85b2-525a4b72ddb6)
+    
+  - Deve-se aprender a "ler" as tabelas, valendo sempre dar uma olhada nas tabelas, por exemplo:
+  - ```sql
+    SELECT * FROM products
+    ```
+  - ![image](https://github.com/user-attachments/assets/605c4862-250d-4f17-8bb9-e0d056ddbb01)
+  - ID, Nome, ID no Fornecedor, Categoria, Quantidade, Preço Unitário, etc.
+  - Alguns identificadores podem ser excessivos, então podemos trabalhar com colunas específicas:
+ 
+  - ```sql
+    SELECT product_name, unit_price, units_in_stock
+    FROM products
+    ```
+  - ![image](https://github.com/user-attachments/assets/c55b7880-2667-470f-a5ba-49a2bd998b87)
+
+  - 📈💰📊💼🌐 Pergunta de Negócios: Quantos $ eu poderia dispôr SE vendêssemos todo o estoque?
+  - ```sql
+    SELECT 
+    	product_name, 
+	    unit_price, 
+	    units_in_stock,
+	    unit_price * units_in_stock
+    FROM products
+    ```
+  - ![image](https://github.com/user-attachments/assets/505b33be-f7c9-43bf-bc43-9d1262417980)
+
+  - Importante, ao trabalhar com várias informações, IDENTAR o conteúdo. Também importante criar "alias" (codinomes)
+  - ```sql
+    SELECT 
+    	product_name, 
+	    unit_price, 
+	    units_in_stock,
+	    unit_price * units_in_stock AS total_revenue
+    FROM products
+    LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/ec2bac39-595a-4623-b2e0-e2e114ea206b)
+ 
+  - 
+  
+
+
