@@ -104,11 +104,11 @@ ___
 
   - Importante, ao trabalhar com várias informações, IDENTAR o conteúdo. Também importante criar "alias" (codinomes)
   - ```sql
-    SELECT 
-    	product_name, 
-	    unit_price, 
-	    units_in_stock,
-	    unit_price * units_in_stock AS total_revenue
+    SELECT
+    	product_name,
+    	unit_price,
+    	units_in_stock,
+    	unit_price * units_in_stock AS total_revenue
     FROM products
     LIMIT 10
     ```
@@ -144,9 +144,6 @@ ___
 	LIMIT 10
     ```
   - ![image](https://github.com/user-attachments/assets/6dd40c6e-35ff-41dd-9d68-17156cd7beff)
-  - 
-
-  
 
   - 📈💰📊💼🌐 Pergunta de Negócios: Quais funcionários possuem um nome que começa com a Letra "M"?
   - ```sql
@@ -156,7 +153,8 @@ ___
     ```
   - ![image](https://github.com/user-attachments/assets/bd6dc344-bd56-48ac-8998-b027850deaa3)
   - O símbolo % serve como coringa no texto (str), então podemos usar ANTES e/OU DEPOIS do termo que buscamos.
-  - Por exemplo, QUEM TRABALHA COM VENDAS?
+  - Por exemplo:
+  - 📈💰📊💼🌐 Pergunta de Negócios: Quem trabalha com "sales" (vendas)?
   - ```sql
 	SELECT * FROM employees
 	WHERE first_name LIKE '%Sales%'
@@ -166,8 +164,12 @@ ___
 
   - Porém, o símbolo % é sensível ao caso (Case Sensitive), ou seja, se eu usar 'SALES' ou 'sales', não aparecerão os resultados como "Sales".
   - Poderíamos utilizar:
-  - ```sql SELECT * FROM your_table WHERE LOWER(column_name) = LOWER('YourValue')```;
-  - ```sql SELECT * FROM your_table WHERE UPPER(column_name) = UPPER('YourValue')```;
+  - ```sql
+    SELECT * FROM your_table WHERE LOWER(column_name) = LOWER('YourValue')
+    ```
+  - ```sql
+    SELECT * FROM your_table WHERE UPPER(column_name) = UPPER('YourValue')
+    ```
   - No PostgreSQL, podemos usar o ILIKE (insensitive like) como comando.
   - ```sql
     SELECT * FROM employees
@@ -175,7 +177,27 @@ ___
     LIMIT 10
     ```
   - ![image](https://github.com/user-attachments/assets/e2154ec4-ecb9-4e81-8ed6-609c975852d5)
+  - 📈💰📊💼🌐 Pergunta de Negócios: Em cada venda, quanto eu arrecadei com cada produto?
+  - ```sql
+    SELECT *, unit_price * quantity AS revenue
+    FROM order_details
+    ```
+  - ![image](https://github.com/user-attachments/assets/2f924cbb-e413-45b5-91df-94f046dca82a)
+  
+  - 📈💰📊💼🌐 Pergunta de Negócios **DESAFIO**: Em cada venda, quanto eu arrecadei com cada produto, considerando que há DESCONTOS?
+  - ```sql
+    SELECT *, unit_price * (1-discount) * quantity AS revenue_discounted
+    FROM order_details
+    ```
+  - ![image](https://github.com/user-attachments/assets/a4ea8813-c9e4-44c7-99eb-344a1da8f61e)
 
-  
-  
+
+
+
+
+___
+
+## Aula 3 - Funções Agregadas
+
+- asdf
 
