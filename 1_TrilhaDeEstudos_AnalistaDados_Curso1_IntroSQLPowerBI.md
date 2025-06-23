@@ -95,12 +95,12 @@ ___
   - ```sql
     SELECT 
     	product_name, 
-	    unit_price, 
-	    units_in_stock,
-	    unit_price * units_in_stock
+	unit_price, 
+	units_in_stock,
+	unit_price * units_in_stock
     FROM products
     ```
-  - ![image](https://github.com/user-attachments/assets/505b33be-f7c9-43bf-bc43-9d1262417980)
+  - ![image](https://github.com/user-attachments/assets/07525e6f-af3c-4b3a-8928-73f47cd0a88e)
 
   - Importante, ao trabalhar com várias informações, IDENTAR o conteúdo. Também importante criar "alias" (codinomes)
   - ```sql
@@ -114,7 +114,68 @@ ___
     ```
   - ![image](https://github.com/user-attachments/assets/ec2bac39-595a-4623-b2e0-e2e114ea206b)
  
+  - A resposta da "query" pode ser salva em um novo arquivo (F8) em formato *.csv por exemplo, para responder diretamente do BD a pergunta de negócios.
+  - Também queremos trabalhar com alguns FILTROS...
+ 
+  - ```sql
+    SELECT * FROM employees LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/25c10755-2a45-478e-bf65-4cc646bad5a8)
+
+  - Palavra chave para filtro = WHERE.
+  - 📈💰📊💼🌐 Pergunta de Negócios: Quais funcionários trabalham em "Seattle"?
+  - ```sql
+    SELECT * FROM employees
+    WHERE city = 'Seattle'
+    LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/cdb690f0-d82f-4e28-a143-02619a5850e9)
+  - ```sql
+    SELECT * FROM employees
+    WHERE city = 'London'
+    LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/94ea0b34-4d83-4650-a625-12a679001cdc)
+  - Podemos filtrar quase qualquer coisa, inclusive DATAS.
+  - 📈💰📊💼🌐 Pergunta de Negócios: Quais funcionários foram contratados APÓS 1993?
+  - ```sql
+	SELECT * FROM employees
+	WHERE hire_date >= '1993-01-01'
+	LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/6dd40c6e-35ff-41dd-9d68-17156cd7beff)
   - 
+
   
 
+  - 📈💰📊💼🌐 Pergunta de Negócios: Quais funcionários possuem um nome que começa com a Letra "M"?
+  - ```sql
+	SELECT * FROM employees
+	WHERE first_name LIKE 'M%'
+	LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/bd6dc344-bd56-48ac-8998-b027850deaa3)
+  - O símbolo % serve como coringa no texto (str), então podemos usar ANTES e/OU DEPOIS do termo que buscamos.
+  - Por exemplo, QUEM TRABALHA COM VENDAS?
+  - ```sql
+	SELECT * FROM employees
+	WHERE first_name LIKE '%Sales%'
+	LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/1c614c49-3d7a-4046-8a6e-e2e346ddab09)
+
+  - Porém, o símbolo % é sensível ao caso (Case Sensitive), ou seja, se eu usar 'SALES' ou 'sales', não aparecerão os resultados como "Sales".
+  - Poderíamos utilizar:
+  - ```sql SELECT * FROM your_table WHERE LOWER(column_name) = LOWER('YourValue')```;
+  - ```sql SELECT * FROM your_table WHERE UPPER(column_name) = UPPER('YourValue')```;
+  - No PostgreSQL, podemos usar o ILIKE (insensitive like) como comando.
+  - ```sql
+    SELECT * FROM employees
+    WHERE title ILIKE '%sales%'
+    LIMIT 10
+    ```
+  - ![image](https://github.com/user-attachments/assets/e2154ec4-ecb9-4e81-8ed6-609c975852d5)
+
+  
+  
 
