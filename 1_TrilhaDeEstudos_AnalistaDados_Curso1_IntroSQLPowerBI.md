@@ -199,5 +199,12 @@ ___
 
 ## Aula 3 - Funções Agregadas
 
-- asdf
+- Funções Agregadas (Agregated Functions SQL).
+- Perguntas tais como: quanto vendemos no mês? Qual o total vendido no mês? Etc.
+- Funções Agregadas:
+	1. Contagem
+	2. Soma
+	3. Média
+	4. Máxima
+	5. Mínimo
 
