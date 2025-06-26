@@ -210,7 +210,8 @@ ___
 - 📈💰📊💼🌐 Pergunta de Negócios: _Em unidades, quanto eu vendi ao total?_
 - ```sql
   -- SELECT quantity FROM order_details
-  SELECT SUM(quantity) FROM order_details
+  -- SELECT SUM(quantity) FROM order_details
+  SELECT SUM(quantity) AS total_units_sold FROM order_details
   ```
 - ![image](https://github.com/user-attachments/assets/3f86b238-8212-4eba-b834-1a395e0d6046)
 - 
