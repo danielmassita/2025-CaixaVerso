@@ -6,6 +6,7 @@
 - Professor: [Leonardo Simões](https://www.linkedin.com/in/leonardo-simoes/)
   - SR Data Scientist
 
+### Dashboard - https://datastudio.google.com/s/jg5Y91GQlXY
 
 ## Estrutura da Apresentação
 
