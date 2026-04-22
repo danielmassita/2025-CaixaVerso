@@ -61,3 +61,36 @@ ___
 
 ___
 
+<img width="1074" height="777" alt="image" src="https://github.com/user-attachments/assets/d367dcfc-197d-4b4f-a4fe-1e46ecffc8f2" />
+
+
+## Desenvolvimento do Projeto
+
+- Tratamento de Dados
+    - Limpeza de Dados - Ajustes de Tipos e Filtros Manuais para Categorias (Gênero (M/F/Outros), Ano Letivo (1-4), Risco de Burnout (Low, Medium, High)).
+    - Tratamento de Valores Nulos - Verificação de integridade (blank), preenchimento de lacunas com média (para não desconfigurar a curva normal).
+    - Remoção de Duplicidades - Desnecessário já que o ID é Único e os dados não possuem index em outras tabelas.
+    - Transformações no Power Query - Colunas condicionais manuais (categorias).
+  
+- Modelagem
+  - Organização das Tabelas - Flat Table
+  - Criação de Relacionamentos (se aplicável) - Não usado na tabela simples.
+ 
+- Métricas
+  - Criação de Medidas (DAX) - Cálculo de Média, Desvio-Padrão, Soma, Min., Máx., Correlação
+  - Exemplos: Total Alunos, % Gênero, % Ano Letivo, % Risco (1,5% - 22% - 76%, Média/Desvio do Sono, Correlação Sono vs. Burnout
+
+- Dashboard
+  - Criação de Visualizaçẽes claras e organizadas
+  - Uso de gráficos adequados - Histograma (normal), Dispersão, Pizza, Gauge
+  - Uso de filtros e interatividade - Filtros de Gênero, Ano Letivo, Risco de Burnout
+ 
+
+___
+
+### Bibliografia Extra
+
+- http://bit.ly/MasEraSoPedir - https://www.geledes.org.br/quadrinho-explica-por-que-as-mulheres-se-sentem-tao-cansadas/
+- https://drauziovarella.uol.com.br/mulher/carga-mental-feminina-por-que-as-mulheres-estao-exaustas/
+- https://www.instagram.com/despatologiza/
+- <img width="878" height="776" alt="image" src="https://github.com/user-attachments/assets/e89771a5-fd3d-462e-a275-fe07dd0a480b" />
