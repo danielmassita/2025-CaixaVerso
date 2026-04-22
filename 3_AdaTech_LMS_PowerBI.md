@@ -12,7 +12,7 @@
 
 - Introdução
   - Tema do Projeto - Saúde Mental de Estudantes;
-  - Dataset escolhido - Kaggle Student Lifestyle, Mental Health & Burnout Insight;
+  - Dataset escolhido - [Kaggle Student Lifestyle, Mental Health & Burnout Insight](https://www.kaggle.com/datasets/ayeshasiddiqa123/student-health);
   - Objetivo da análise - Verificar quais variáveis mais impactam a saúde mental de estudantes (universitários); Criticar a estrutura e não o indivíduo.
 
 - Entendimento dos Dados
