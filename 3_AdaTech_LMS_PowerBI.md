@@ -93,5 +93,6 @@ ___
 
 - http://bit.ly/MasEraSoPedir - https://www.geledes.org.br/quadrinho-explica-por-que-as-mulheres-se-sentem-tao-cansadas/
 - https://drauziovarella.uol.com.br/mulher/carga-mental-feminina-por-que-as-mulheres-estao-exaustas/
+- https://thinkolga.com/report/economia-trabalho/
 - https://www.instagram.com/despatologiza/
 - <img width="878" height="776" alt="image" src="https://github.com/user-attachments/assets/e89771a5-fd3d-462e-a275-fe07dd0a480b" />
