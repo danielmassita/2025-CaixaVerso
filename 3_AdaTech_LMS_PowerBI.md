@@ -69,9 +69,12 @@ ___
 
 - Tratamento de Dados
     - Limpeza de Dados - Ajustes de Tipos e Filtros Manuais para Categorias (Gênero (M/F/Outros), Ano Letivo (1-4), Risco de Burnout (Low, Medium, High)).
-    - Tratamento de Valores Nulos - Verificação de integridade (blank), preenchimento de lacunas com média (para não desconfigurar a curva normal).
+      - <img width="1793" height="256" alt="image" src="https://github.com/user-attachments/assets/fc2aadb6-5792-4b8f-ab4d-e3fd8510cba1" />
+    - Tratamento de Valores Nulos - Verificação de integridade (blank), preenchimento de lacunas com média (para não desconfigurar a curva normal), problema de separador (ponto e vírgulas do padrão estadunidense).
     - Remoção de Duplicidades - Desnecessário já que o ID é Único e os dados não possuem index em outras tabelas.
-    - Transformações no Power Query - Colunas condicionais manuais (categorias).
+    - Transformações no Power Query - Colunas condicionais manuais (categorias e filtros manualmente implementados).
+      - <img width="1487" height="325" alt="image" src="https://github.com/user-attachments/assets/777b5aa5-e1b6-4c4a-81b3-65f1c9374a77" />
+
   
 - Modelagem
   - Organização das Tabelas - Flat Table
@@ -80,6 +83,8 @@ ___
 - Métricas
   - Criação de Medidas (DAX) - Cálculo de Média, Desvio-Padrão, Soma, Min., Máx., Correlação
   - Exemplos: Total Alunos, % Gênero, % Ano Letivo, % Risco (1,5% - 22% - 76%, Média/Desvio do Sono, Correlação Sono vs. Burnout
+    - <img width="621" height="508" alt="image" src="https://github.com/user-attachments/assets/c78a36f4-9746-41b5-98d0-c419be0a0ed5" />
+
 
 - Dashboard
   - Criação de Visualizaçẽes claras e organizadas
@@ -91,8 +96,9 @@ ___
 
 ### Bibliografia Extra
 
-- http://bit.ly/MasEraSoPedir - https://www.geledes.org.br/quadrinho-explica-por-que-as-mulheres-se-sentem-tao-cansadas/
-- https://drauziovarella.uol.com.br/mulher/carga-mental-feminina-por-que-as-mulheres-estao-exaustas/
+- http://bit.ly/MasEraSoPedir
+  `https://www.geledes.org.br/quadrinho-explica-por-que-as-mulheres-se-sentem-tao-cansadas/`
+- https://drauziovarella.uol.com.br/mulher/carga-mental-feminina-por-que-as-mulheres-estao-exaustas/ 
 - https://thinkolga.com/report/economia-trabalho/
 - https://www.instagram.com/despatologiza/
-- <img width="878" height="776" alt="image" src="https://github.com/user-attachments/assets/e89771a5-fd3d-462e-a275-fe07dd0a480b" />
+  - <img width="878" height="776" alt="image" src="https://github.com/user-attachments/assets/e89771a5-fd3d-462e-a275-fe07dd0a480b" />
