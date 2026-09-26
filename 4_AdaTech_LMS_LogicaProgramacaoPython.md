@@ -1,14 +1,31 @@
-CAIXAVERSO - FC5 | Analista Dados - I | #1735
-Logica de programação em Python
+CAIXAVERSO - FC5 | Analista Dados - II | #1735
+Logica de Programação em Python
 
 """
-# CAIXAVERSO - 09 | Analista Dados - I | #1650
-`[https://caixaverso.ada.tech/](https://lms.ada.tech/student/classroom-drive/by-class-id/505eda29-987d-41ea-b2d9-c1b7c8d4e917)`
+# CAIXAVERSO - FC5 | Analista Dados - II | #1735
 
-![Copilot_20250609_002008](https://github.com/user-attachments/assets/b9854d88-8df6-4c5c-bbfd-72d978a06dd5)
+`[https://caixaverso.ada.tech/](https://lms.ada.tech/student/topics/by-class-id/097ee233-0745-490b-b38c-1dc99dfd1305/by-module-id/4e6fa598-53f4-4856-a75d-b7e879ff1b7d)`
 
-- Professor: [Leonardo Simões](https://www.linkedin.com/in/leonardo-simoes/)
-  - SR Data Scientist
+<img width="1024" height="682" alt="image" src="https://github.com/user-attachments/assets/25020c6a-0432-40a2-a039-655d14492299" />
+
+
+- Professor: [](https://www.linkedin.com/in/daniel-massita-tonolli/)
+  - SR Data Alumni
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Dashboard - https://datastudio.google.com/s/jg5Y91GQlXY
 
