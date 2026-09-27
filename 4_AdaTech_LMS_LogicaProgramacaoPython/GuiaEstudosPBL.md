@@ -192,305 +192,443 @@ Vamos aos três, na ordem que você pediu. Cada parte foi feita para você **est
 
 ---
 
-# PARTE 1 — Explicação linha por linha: `salvar_escola`
+# PARTE 1 — Explicação linha por linha: ROADMAP DE ESTUDOS
 
-Vou pegar a função exatamente como está no código e destrinchar cada linha. Também incluo `carregar_escola` no final porque as duas formam um **par** (uma escreve, outra lê) — entender uma ajuda a entender a outra.
+🗺️ Roadmap de Debug — escola_idiomas.py
+Guia de estudo para depurar e entender o código como um todo. Cada bloco é uma estação de debug: onde olhar, o que testar e qual conceito está em jogo.
 
-## 📜 Código completo da função (referência)
+🧭 Mapa geral do arquivo
+text
+[Blocos 1-3]   CONSTANTES + IMPORTS          ← leia antes de tudo
+[Blocos 4-14]  CAMADA 1 — DADOS              ← testar isoladamente
+[Bloco 15]     CAMADA 2 — PERSISTÊNCIA       ← testar com arquivo TXT
+[Bloco 16]     CAMADA 3 — INTERFACE          ← testar com input
+[Bloco 17]     ORQUESTRADOR (main)           ← testar o ciclo completo
+Ordem de debug sugerida: 4 → 5 → 6 → 15 → 17 → 7-14 → 16. Assim você testa a base antes de subir a complexidade.
 
-```python
-def salvar_escola(escola, caminho=ARQUIVO_BD):
-    """
-    Grava a escola no TXT no formato de seções.
-    ANTES de gravar, faz backup do arquivo atual (se existir).
-    """
-    try:
-        if os.path.exists(caminho):
-            backup = fazer_backup(caminho)
-            if backup:
-                print(f"🗂️  Backup criado em: {backup}")
+🔹 Blocos 1–3 — Setup (constantes + imports)
+Função: preparar ferramentas e valores fixos.
 
-        with open(caminho, "w", encoding="utf-8") as f:
-            # ---- CONFIG ----
-            f.write("[CONFIG]\n")
-            f.write(f"nota_minima={escola['nota_minima']}\n\n")
+Conceitos usados:
 
-            # ---- ALUNOS ----
-            f.write("[ALUNOS]\n")
-            f.write("# matricula;nome;nivel;idade\n")
-            for aluno in escola["alunos"]:
-                f.write(
-                    f"{aluno['matricula']};{aluno['nome']};"
-                    f"{aluno['nivel']};{aluno['idade']}\n"
-                )
-            f.write("\n")
+import (módulos: os, shutil, datetime)
 
-            # ---- NOTAS ----
-            f.write("[NOTAS]\n")
-            f.write("# matricula;idioma;nota\n")
-            for aluno in escola["alunos"]:
-                for idioma, notas in aluno["boletim"].items():
-                    for nota in notas:
-                        f.write(f"{aluno['matricula']};{idioma};{nota}\n")
+Constantes em MAIÚSCULAS
 
-        print(f"💾 Escola salva em '{caminho}'.")
+Estruturas literais (list, dict)
+
+Código:
+
+python
+import os, shutil
+from datetime import datetime
+
+ARQUIVO_BD     = "escola.txt"
+IDIOMAS_VALIDOS = ["Português", "Inglês", ...]
+NIVEIS_VALIDOS  = {"Básico": ["A1","A2"], ...}
+CREDENCIAIS_DIRETOR = {"login": "admin", "senha": "admin"}
+Debug: Se IDIOMAS_VALIDOS estiver vazio ou NIVEIS_VALIDOS com chave errada → tudo quebra.
+
+🔹 Bloco 4 — criar_escola_vazia()
+O que faz: cria a estrutura base em memória.
+
+Conceitos:
+
+Dicionário literal
+
+Return de estrutura vazia
+
+Uso de constante (NOTA_MINIMA_PADRAO)
+
+Código:
+
+python
+return {"alunos": [], "nota_minima": NOTA_MINIMA_PADRAO}
+Debug: imprima criar_escola_vazia() e veja se tem as duas chaves.
+
+🔹 Bloco 5 — buscar_aluno()
+O que faz: encontra um aluno pela matrícula.
+
+Conceitos:
+
+for sobre lista
+
+Comparação ==
+
+return dentro de loop (early return)
+
+except (KeyError, TypeError)
+
+Código:
+
+python
+for aluno in escola["alunos"]:
+    if aluno["matricula"] == matricula:
+        return aluno
+return None
+Debug: se retorna None mesmo existindo, verifique se matricula é int (não string).
+
+🔹 Bloco 6 — adicionar_aluno()
+O que faz: cadastra aluno (Create do CRUD).
+
+Conceitos:
+
+isinstance() para tipos
+
+raise TypeError / raise ValueError
+
+try/except ativo (nós levantamos erros)
+
+Parâmetro com valor padrão (idiomas=None)
+
+Validação de unicidade via buscar_aluno
+
+Código:
+
+python
+if not isinstance(matricula, int) or matricula <= 0:
+    raise TypeError("Matrícula deve ser um inteiro positivo.")
+if buscar_aluno(escola, matricula) is not None:
+    raise ValueError(f"Já existe aluno com matrícula {matricula}.")
+escola["alunos"].append(novo_aluno)
+Debug: teste com matrícula string, nome vazio, idade negativa, matrícula duplicada.
+
+🔹 Bloco 7 — cadastrar_nota()
+O que faz: adiciona uma nota a um idioma.
+
+Conceitos:
+
+float() para coerção
+
+setdefault(chave, []) — cria ou reutiliza a lista
+
+.append() para acumular notas
+
+Validação de range (0.0 <= nota <= 10.0)
+
+Código:
+
+python
+nota = float(nota)
+aluno["boletim"].setdefault(idioma, [])
+aluno["boletim"][idioma].append(round(nota, 1))
+Debug: o setdefault é a peça-chave — testar idioma novo e idioma existente.
+
+🔹 Bloco 8 — alterar_nota()
+O que faz: altera uma nota específica (por posição).
+
+Conceitos:
+
+Conversão 1-based → 0-based (posicao - 1)
+
+Comparação encadeada (0 <= indice < len(notas))
+
+IndexError
+
+Guardar valor antigo antes de sobrescrever
+
+Código:
+
+python
+indice = posicao - 1
+if not (0 <= indice < len(notas)):
+    raise IndexError(f"Posição {posicao} inválida. Existem {len(notas)} nota(s).")
+antiga = notas[indice]
+notas[indice] = round(nova_nota, 1)
+Debug: testar posicao=0 (não deve virar -1), posicao além do tamanho.
+
+🔹 Bloco 9 — alterar_dado_cadastral()
+O que faz: altera qualquer campo cadastral (nome, nivel, idade).
+
+Conceitos:
+
+set ({...}) para campos_permitidos
+
+Acesso dinâmico: aluno[campo] (campo é variável)
+
+Conversão condicional (int() só para idade)
+
+Short-circuit com and
+
+Proteção contra alterar matrícula/boletim
+
+Código:
+
+python
+campos_permitidos = {"nome", "nivel", "idade"}
+if campo not in campos_permitidos:
+    raise ValueError(...)
+if campo == "idade":
+    novo_valor = int(novo_valor)
+aluno[campo] = novo_valor
+Debug: tentar campo="matricula" (deve bloquear), testar todos os 3 campos válidos.
+
+🔹 Bloco 10 — visualizar_aluno()
+O que faz: imprime ficha completa com boletim (Read do CRUD).
+
+Conceitos:
+
+Repetição de string ("═" * 55)
+
+Unicode de caixa (╔ ═ ║)
+
+.items() para iterar dicionário
+
+Alinhamento :<12
+
+Formatação .1f
+
+Dois níveis de vazio (if not boletim vs if notas)
+
+Código:
+
+python
+print("═" * 55)
+for idioma, notas in aluno["boletim"].items():
+    if notas:
+        media = sum(notas) / len(notas)
+        print(f" {idioma:<12}: {notas}  |  média: {media:.1f}")
+    else:
+        print(f" {idioma:<12}: (sem notas cadastradas)")
+Debug: testar aluno sem boletim, aluno com idioma vazio, aluno com notas.
+
+🔹 Bloco 11 — calcular_media()
+O que faz: retorna (media, situacao) para aluno/idioma.
+
+Conceitos:
+
+Retorno múltiplo em tupla (return media, situacao)
+
+Tupla sentinela (None, None) para falhas
+
+escola["nota_minima"] — config global
+
+Operador ternário
+
+>= (fronteira inclusiva)
+
+Código:
+
+python
+media = round(sum(notas) / len(notas), 1)
+minimo = escola["nota_minima"]
+situacao = "APROVADO" if media >= minimo else "REPROVADO"
+return media, situacao
+Debug: testar media == minimo (deve aprovar), verificar se alteração na config reflete.
+
+🔹 Bloco 12 — apagar_aluno()
+O que faz: remove aluno (Delete do CRUD).
+
+Conceitos:
+
+enumerate() (índice + valor)
+
+.pop(indice) (remove por posição)
+
+return dentro do loop (evita bug de modificar durante iteração)
+
+raise após o loop (não achou)
+
+Código:
+
+python
+for indice, aluno in enumerate(escola["alunos"]):
+    if aluno["matricula"] == matricula:
+        escola["alunos"].pop(indice)
         return True
+raise KeyError(f"Aluno {matricula} não encontrado.")
+Debug: apagar 1º, do meio, último; tentar apagar inexistente.
 
-    except (OSError, KeyError) as erro:
-        print(f"❌ Erro ao salvar: {erro}")
-        return False
-```
+🔹 Bloco 13 — analise_geral()
+O que faz: estatísticas agregadas por idioma.
 
-## 🔬 Linha por linha
+Conceitos:
 
-### Linha 1 — Assinatura da função
+Dicionário como acumulador
 
-```python
-def salvar_escola(escola, caminho=ARQUIVO_BD):
-```
+setdefault + extend para achatar listas
 
-| Pedaço | O que é | Por quê |
-|---|---|---|
-| `def` | Palavra-chave do Python | Declara uma função |
-| `salvar_escola` | Nome da função | Verbo + substantivo: "salvar a escola" |
-| `escola` | Parâmetro obrigatório | O dicionário em memória que queremos gravar |
-| `caminho=ARQUIVO_BD` | **Parâmetro com valor padrão** | Se ninguém passar caminho, usa `"escola.txt"`. Permite salvar num caminho alternativo (ex: `salvar_escola(escola, "teste.txt")`) — muito útil para testes |
+sum(1 for x in ... if ...) (compreensão geradora)
 
-> 💡 Isso é o mesmo conceito estudado no capítulo **"Parâmetros e retorno de funções"**.
+Cálculo de taxa (reprovadas / total * 100)
 
-### Linha 2-5 — Docstring
+Retorno {} (objeto nulo) em falha
 
-```python
-    """
-    Grava a escola no TXT no formato de seções.
-    ANTES de gravar, faz backup do arquivo atual (se existir).
-    """
-```
+Duas fases: agrupar → calcular
 
-- As três aspas (`"""`) abrem um **comentário de múltiplas linhas**.
-- Python guarda isso em `salvar_escola.__doc__`.
-- Ajuda o `help(salvar_escola)` no terminal e o autocompletar do VS Code.
-- Documenta **o que** a função faz, não **como** — isso está no corpo.
+Código:
 
-### Linha 6 — Início do try
+python
+por_idioma = {}
+for aluno in escola["alunos"]:
+    for idioma, notas in aluno["boletim"].items():
+        if notas:
+            por_idioma.setdefault(idioma, []).extend(notas)
 
-```python
-    try:
-```
+for idioma, notas in por_idioma.items():
+    media = round(sum(notas) / len(notas), 1)
+    reprovadas = sum(1 for n in notas if n < minimo)
+    taxa = round(reprovadas / len(notas) * 100, 1)
+Debug: escola vazia, alunos sem notas, notas variadas.
 
-- Tudo que pode falhar fica dentro do `try`.
-- Falhas previstas: disco cheio, arquivo sem permissão, chave `nota_minima` faltando.
-- Se algo der errado, o Python **pula direto para o `except`** no final — não trava o programa.
+🔹 Bloco 14 — quantidade_alunos()
+O que faz: retorna len(escola["alunos"]).
 
-### Linha 7-10 — Backup condicional
+Conceitos:
 
-```python
-        if os.path.exists(caminho):
-            backup = fazer_backup(caminho)
-            if backup:
-                print(f"🗂️  Backup criado em: {backup}")
-```
+len() como cálculo O(1)
 
-| Linha | Explicação |
-|---|---|
-| `os.path.exists(caminho)` | Retorna `True` se o arquivo já existe |
-| `fazer_backup(caminho)` | Chama a função auxiliar (definida em outra parte do código) que **copia** o arquivo para `backups/` com timestamp |
-| `if backup:` | Se a função devolveu um caminho (não `None`), imprime |
-| `print(f"...")` | **f-string**: a variável `backup` é interpolada dentro das chaves `{}` |
+Retorno 0 como "objeto nulo" para inteiro
 
-> ⚠️ **Ponto-chave de design**: o backup é feito **antes** do `open(..., "w")`. Se você abrir o arquivo em modo `"w"` primeiro, ele já é **truncado** (zerado) — e o backup copiaria o arquivo vazio. Ordem importa!
+Função de consulta silenciosa (não imprime)
 
-### Linha 11 — Abrindo o arquivo com `with`
+Código:
 
-```python
-        with open(caminho, "w", encoding="utf-8") as f:
-```
+python
+try:
+    return len(escola["alunos"])
+except (TypeError, KeyError):
+    return 0
+Debug: chamar com escola = None, {}, {"alunos": [1,2,3]}.
 
-| Pedaço | O que é |
-|---|---|
-| `open(caminho, "w", encoding="utf-8")` | Abre o arquivo. `"w"` = **write** (sobrescreve). `encoding="utf-8"` garante acentos corretos |
-| `with ... as f:` | **Gerenciador de contexto**. Fecha o arquivo automaticamente ao sair do bloco — mesmo se der erro |
+🔹 Bloco 15 — Persistência (4 funções)
+O que faz: ler/gravar em arquivo TXT com backup.
 
-> 🎓 **Por que `with` e não `f = open(...)` / `f.close()`?**
-> Porque se der erro no meio, você esquece de fechar, e o arquivo fica travado no Windows. `with` resolve isso.
-> **Isso é o mesmo conceito de `finally`** estudado no capítulo de Tratamento de Exceção — mas mais elegante.
+Conceitos por função:
 
-### Linha 12-14 — Escrevendo a seção `[CONFIG]`
+Função	Conceitos
+fazer_backup	os.path.exists, os.makedirs(exist_ok=True), shutil.copy2, datetime.strftime
+salvar_escola	with open("w"), f.write, \n\n, serialização manual com ;
+carregar_escola	with open("r"), for linha in f, rstrip, split, startswith, máquina de estados (secao), recursão
+criar_arquivo_modelo	Reuso de adicionar_aluno/cadastrar_nota, salvamento duplo (BD + gabarito)
+Código-chave (máquina de estados):
 
-```python
-            f.write("[CONFIG]\n")
-            f.write(f"nota_minima={escola['nota_minima']}\n\n")
-```
+python
+secao = None
+for linha in f:
+    linha = linha.rstrip("\n")
+    if not linha.strip() or linha.startswith("#"):
+        continue
+    if linha.startswith("[") and linha.endswith("]"):
+        secao = linha.strip("[]")
+        continue
+    if secao == "CONFIG":
+        ...
+    elif secao == "ALUNOS":
+        ...
+    elif secao == "NOTAS":
+        ...
+Debug: rode criar_arquivo_modelo() e abra escola.txt para verificar formato. Depois carregar_escola() e imprima.
 
-- `f.write(...)` grava texto no arquivo. **Não adiciona quebra de linha sozinho** — por isso o `\n` explícito.
-- `\n` = quebra de linha (Unix). No Windows também funciona.
-- `escola['nota_minima']` acessa o valor no dicionário da escola.
-- O `\n\n` (dois) cria uma **linha em branco** entre seções — deixa o arquivo mais legível.
+🔹 Bloco 16 — Interface (13 funções)
+O que faz: menu tipo "caixa eletrônico".
 
-### Linha 16-19 — Seção `[ALUNOS]` (cabeçalho)
+Conceitos por função:
 
-```python
-            f.write("[ALUNOS]\n")
-            f.write("# matricula;nome;nivel;idade\n")
-```
+Função	Conceitos
+limpar_tela	os.system, os.name, operador ternário
+exibir_cabecalho	.center(), "═" * N, f-strings com :<
+exibir_menu	Triple-quoted string, ASCII art, emojis
+pausar	input() como pausa
+fluxo_* (12)	int(input()), .strip(), .lower(), .split(","), compreensão de lista, guard clause, autenticação com dict
+Código-chave:
 
-- `[ALUNOS]` é o **marcador de seção** que o parser vai procurar depois.
-- A linha `# matricula;nome;nivel;idade` é um **comentário** para humanos. O parser pula linhas que começam com `#`.
-- Esse padrão é o mesmo usado em arquivos `.ini` (Windows) e `pyproject.toml`.
+python
+# limpar_tela
+os.system("cls" if os.name == "nt" else "clear")
 
-### Linha 20-25 — Laço que escreve cada aluno
+# fluxo_adicionar (limpeza da lista)
+idiomas = [i.strip() for i in idiomas_txt.split(",") if i.strip()]
 
-```python
-            for aluno in escola["alunos"]:
-                f.write(
-                    f"{aluno['matricula']};{aluno['nome']};"
-                    f"{aluno['nivel']};{aluno['idade']}\n"
-                )
-```
+# fluxo_apagar (confirmação)
+if confirma in ("s", "sim", "y", "yes"):
+    apagar_aluno(escola, mat)
 
-Destrinchando:
+# fluxo_configuracoes (autenticação)
+if login != CREDENCIAIS_DIRETOR["login"] or senha != CREDENCIAIS_DIRETOR["senha"]:
+    return
+Debug: testar cada fluxo individualmente chamando fluxo_X(escola) no prompt Python.
 
-1. `escola["alunos"]` é a **lista de dicionários** que carrega todos os alunos.
-2. `for aluno in ...` percorre cada dicionário.
-3. Dentro da f-string, montamos uma linha:
-   ```
-   "1;Ana Silva;Básico;15\n"
-   ```
-   Os campos são separados por `;` — escolhido porque **nomes raramente têm `;`** (diferente de vírgula).
-4. O `\n` fecha a linha.
-5. **A quebra de linha `f"..."` em duas strings** (`f"..."` colado em `f"..."`) é uma forma de o Python **concatenar automaticamente** strings literais adjacentes — recurso da linguagem, não é um operador `+`.
+🔹 Bloco 17 — main() + __main__
+O que faz: orquestra tudo.
 
-> 💡 Por que **não** usamos `str(aluno)` ou `pickle` ou JSON?
-> Porque o requisito era **legível por humano**. Um arquivo `1;Ana Silva;Básico;15` qualquer pessoa entende; um JSON é mais verboso; um pickle é binário.
+Conceitos:
 
-### Linha 26 — Linha em branco após ALUNOS
+Dispatch table (acoes = {"1": fluxo_listar, ...})
 
-```python
-            f.write("\n")
-```
+Funções como valores (sem parênteses no dict)
 
-Separa visualmente da próxima seção. O parser ignora linhas vazias.
+lambda para opção 10
 
-### Linha 28-32 — Seção `[NOTAS]`
+while True + break (event loop)
 
-```python
-            f.write("[NOTAS]\n")
-            f.write("# matricula;idioma;nota\n")
-            for aluno in escola["alunos"]:
-                for idioma, notas in aluno["boletim"].items():
-                    for nota in notas:
-                        f.write(f"{aluno['matricula']};{idioma};{nota}\n")
-```
+try/except Exception como rede de segurança
 
-**Três `for` aninhados** — o coração da normalização:
+if __name__ == "__main__": (guard)
 
-| Nível | Percorre | Exemplo |
-|---|---|---|
-| 1º `for` | Cada aluno | `Ana Silva` |
-| 2º `for` | Cada idioma do boletim | `Inglês`, `Espanhol` |
-| 3º `for` | Cada nota daquele idioma | `[8.5, 7.0]` |
+Confirmação antes de salvar
 
-`.items()` retorna pares `(chave, valor)` do dicionário. É a forma "pythonica" de percorrer dicionários — estudado no capítulo **Dicionários**.
+Código-chave:
 
-**Resultado no arquivo:**
-```text
-1;Inglês;8.5
-1;Inglês;7.0
-1;Espanhol;9.0
-2;Inglês;6.0
-...
-```
+python
+acoes = {
+    "1": fluxo_listar,
+    "10": lambda e: print(f"... {quantidade_alunos(e)}"),
+}
 
-Cada nota vira **uma linha**. Isso é o que permite calcular médias depois (é só filtrar por matrícula+idioma).
+while True:
+    ...
+    opcao = input("👉 ").strip()
+    if opcao in ("0", "12"):
+        break
+    elif opcao in acoes:
+        try:
+            acoes[opcao](escola)
+        except Exception as erro:
+            print(f"⚠️  {erro}")
+    pausar()
 
-### Linha 34-35 — Sucesso
+if __name__ == "__main__":
+    main()
+Debug: rodar python escola_idiomas.py e testar todas as 12 opções do menu.
 
-```python
-        print(f"💾 Escola salva em '{caminho}'.")
-        return True
-```
+🛠️ Roadmap de Debug — Ordem sugerida
+Execute estes testes nesta ordem para validar o sistema:
 
-- Fora do `with` (o arquivo já foi fechado automaticamente).
-- Retorna `True` para indicar sucesso — padrão do projeto: **toda função de escrita retorna bool**.
+#	Teste	O que valida
+1	print(criar_escola_vazia())	Bloco 4
+2	Adicionar 3 alunos + buscar por matrícula	Blocos 5, 6
+3	Salvar e recarregar; comparar estruturas	Bloco 15 (persistência)
+4	Rodar main() e testar opções 1, 2, 12	Blocos 16, 17
+5	Cadastrar notas em 2 idiomas, testar visualização	Blocos 7, 10
+6	Alterar nota (2ª posição) e dado cadastral	Blocos 8, 9
+7	Calcular média, testar fronteira (media == 6.0)	Bloco 11
+8	Apagar aluno e verificar que sumiu	Bloco 12
+9	Rodar análise geral com vários alunos	Bloco 13
+10	Testar opção 11 com senha errada (deve negar)	Bloco 16
+11	Testar Ctrl+C (deve interromper, não capturar)	Bloco 17
+🎯 Checklist de conceitos (para revisar antes da defesa)
+□ Listas: append, extend, pop, insert, slicing
+□ Dicionários: get, setdefault, items, keys, values, in
+□ Tuplas: retorno múltiplo, desempacotamento
+□ Sets: para verificação de pertencimento rápido
+□ Compreensão de listas e geradores
+□ lambda, map, filter, reduce (conceitual)
+□ Funções: parâmetros padrão, *args, **kwargs (conceitual)
+□ Tratamento de exceções: try/except/else/finally, raise
+□ Arquivos: open, with, modos r/w, encoding
+□ os, shutil, datetime
+□ Dispatch table
+□ if __name__ == "__main__"
+□ Arquitetura em 3 camadas
 
-### Linha 37-39 — Tratamento de exceção
+Esse é o seu mapa completo. Com ele você consegue:
 
-```python
-    except (OSError, KeyError) as erro:
-        print(f"❌ Erro ao salvar: {erro}")
-        return False
-```
+- Estudar cada bloco isoladamente.
+- Debugar o código rodando testes incrementais.
+- Explicar ao professor exatamente onde cada conceito aparece e como cheguei aqui com um chinês me dando a mão ;)
 
-| Pedaço | Explicação |
-|---|---|
-| `except (OSError, KeyError)` | Captura **duas famílias** de erros. `OSError` = problema de arquivo/disco. `KeyError` = chave faltando no dicionário (ex: `escola['nota_minima']` se por algum motivo não existir) |
-| `as erro` | Dá um **apelido** à exceção. `erro` contém a mensagem original |
-| `print(f"...{erro}")` | Mostra a mensagem para o usuário |
-| `return False` | Sinaliza falha para quem chamou |
-
-> ⚠️ **Detalhe importante**: dentro do `except` **não re-abrimos nem re-fechamos** o arquivo. O `with` já cuidou disso, mesmo em caso de erro. Isso é o "finally disfarçado".
-
----
-
-## 📖 Bônus — `carregar_escola` (o par inverso)
-
-```python
-def carregar_escola(caminho=ARQUIVO_BD):
-    escola = criar_escola_vazia()
-
-    try:
-        if not os.path.exists(caminho):
-            print(f"ℹ️  Arquivo '{caminho}' não encontrado. Criando modelo...")
-            criar_arquivo_modelo()
-            return carregar_escola(caminho)
-
-        secao = None
-        with open(caminho, "r", encoding="utf-8") as f:
-            for linha in f:
-                linha = linha.rstrip("\n")
-                if not linha.strip() or linha.startswith("#"):
-                    continue
-                if linha.startswith("[") and linha.endswith("]"):
-                    secao = linha.strip("[]")
-                    continue
-
-                if secao == "CONFIG":
-                    chave, valor = linha.split("=")
-                    if chave == "nota_minima":
-                        escola["nota_minima"] = float(valor)
-
-                elif secao == "ALUNOS":
-                    mat, nome, nivel, idade = linha.split(";")
-                    escola["alunos"].append({
-                        "matricula": int(mat),
-                        "nome": nome,
-                        "nivel": nivel,
-                        "idade": int(idade),
-                        "boletim": {},
-                    })
-
-                elif secao == "NOTAS":
-                    mat, idioma, nota = linha.split(";")
-                    aluno = buscar_aluno(escola, int(mat))
-                    if aluno is not None:
-                        aluno["boletim"].setdefault(idioma, []).append(float(nota))
-
-        return escola
-
-    except (OSError, ValueError, KeyError) as erro:
-        print(f"❌ Erro ao carregar '{caminho}': {erro}")
-        return criar_escola_vazia()
-```
-
-**Como ler isso em 5 passos mentais:**
-
-1. **Cria a escola vazia** — sempre parte de algo válido, mesmo se tudo falhar.
-2. **Se o arquivo não existe**: cria o modelo, chama a si mesma de novo (**recursão!**).
-3. **Abre o arquivo** e lê linha a linha.
-4. **Máquina de estados**: `secao` guarda em que bloco estamos. Cada linha é interpretada de acordo com `secao`.
-5. **Constrói o dicionário em memória** de volta, na ordem inversa do que `salvar_escola` fez.
-
-**Conceitos aqui:** `rstrip` (remove `\n` do fim), `strip("[]")` (remove colchetes), `split(";")` (divide string em lista), `setdefault` (cria chave com valor padrão se não existir), **recursão** quando o arquivo não existe.
+Foguete não tem ré! 🚀
 
 ---
 
@@ -694,8 +832,8 @@ Esse **delay** entre "operação em memória" e "gravação em disco" é o que d
 
 | Item | Onde |
 |---|---|
-| Explicação linha por linha de `salvar_escola` | Parte 1 |
-| Bônus: `carregar_escola` explicada | Parte 1 (final) |
+| Explicação ROADMAP | Parte 1 |
+| Bônus: detalhes avançados apenas no "prompt" explicados | Parte 1 (final) |
 | Diagrama ASCII do `main()` | Parte 2 |
 | Diagrama do despacho de ações | Parte 2 |
 | Diagrama das 3 camadas | Parte 2 |
