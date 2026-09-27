@@ -176,50 +176,45 @@ Sugestões para você evoluir sozinho depois de rodar o código:
 
 ---
 
-Se quiser, no próximo passo eu:
-
-- Te explico **linha por linha** de uma função específica (ex: `salvar_escola`);
-- Faço um **diagrama ASCII** do fluxo `main()` → `ações` → função;
-- Monto o **README.md** do projeto no padrão GitHub (igual fizemos com os outros).
-
-Qual desses você quer? 🚀
-
 ___
 
 # 🎓 Pacote Completo — Explicação, Diagrama e README
 
-Vamos aos três, na ordem que você pediu. Cada parte foi feita para você **estudar**, não só copiar.
+# PARTE 1 — Explicação linha por linha: ROADMAP DE ESTUDOS
+
+[quote]
+# 🗺️ Roadmap de Debug — `escola_idiomas.py`
+
+Guia de estudo para **depurar e entender** o código como um todo. Cada bloco é uma **estação de debug**: onde olhar, o que testar e qual conceito está em jogo.
 
 ---
 
-# PARTE 1 — Explicação linha por linha: ROADMAP DE ESTUDOS
+## 🧭 Mapa geral do arquivo
 
-🗺️ Roadmap de Debug — escola_idiomas.py
-Guia de estudo para depurar e entender o código como um todo. Cada bloco é uma estação de debug: onde olhar, o que testar e qual conceito está em jogo.
-
-🧭 Mapa geral do arquivo
-text
+```text
 [Blocos 1-3]   CONSTANTES + IMPORTS          ← leia antes de tudo
 [Blocos 4-14]  CAMADA 1 — DADOS              ← testar isoladamente
 [Bloco 15]     CAMADA 2 — PERSISTÊNCIA       ← testar com arquivo TXT
 [Bloco 16]     CAMADA 3 — INTERFACE          ← testar com input
 [Bloco 17]     ORQUESTRADOR (main)           ← testar o ciclo completo
-Ordem de debug sugerida: 4 → 5 → 6 → 15 → 17 → 7-14 → 16. Assim você testa a base antes de subir a complexidade.
+```
 
-🔹 Blocos 1–3 — Setup (constantes + imports)
-Função: preparar ferramentas e valores fixos.
+**Ordem de debug sugerida:** `4 → 5 → 6 → 15 → 17 → 7-14 → 16`. Assim você testa a base antes de subir a complexidade.
 
-Conceitos usados:
+---
 
-import (módulos: os, shutil, datetime)
+## 🔹 Blocos 1–3 — Setup (constantes + imports)
 
-Constantes em MAIÚSCULAS
+**Função:** preparar ferramentas e valores fixos.
 
-Estruturas literais (list, dict)
+**Conceitos usados:**
+- `import` (módulos: `os`, `shutil`, `datetime`)
+- Constantes em MAIÚSCULAS
+- Estruturas literais (`list`, `dict`)
 
-Código:
+**Código:**
 
-python
+```python
 import os, shutil
 from datetime import datetime
 
@@ -227,162 +222,166 @@ ARQUIVO_BD     = "escola.txt"
 IDIOMAS_VALIDOS = ["Português", "Inglês", ...]
 NIVEIS_VALIDOS  = {"Básico": ["A1","A2"], ...}
 CREDENCIAIS_DIRETOR = {"login": "admin", "senha": "admin"}
-Debug: Se IDIOMAS_VALIDOS estiver vazio ou NIVEIS_VALIDOS com chave errada → tudo quebra.
+```
 
-🔹 Bloco 4 — criar_escola_vazia()
-O que faz: cria a estrutura base em memória.
+**Debug:** Se `IDIOMAS_VALIDOS` estiver vazio ou `NIVEIS_VALIDOS` com chave errada → **tudo quebra**.
 
-Conceitos:
+---
 
-Dicionário literal
+## 🔹 Bloco 4 — `criar_escola_vazia()`
 
-Return de estrutura vazia
+**O que faz:** cria a estrutura base em memória.
 
-Uso de constante (NOTA_MINIMA_PADRAO)
+**Conceitos:**
+- Dicionário literal
+- Return de estrutura vazia
+- Uso de constante (`NOTA_MINIMA_PADRAO`)
 
-Código:
+**Código:**
 
-python
+```python
 return {"alunos": [], "nota_minima": NOTA_MINIMA_PADRAO}
-Debug: imprima criar_escola_vazia() e veja se tem as duas chaves.
+```
 
-🔹 Bloco 5 — buscar_aluno()
-O que faz: encontra um aluno pela matrícula.
+**Debug:** imprima `criar_escola_vazia()` e veja se tem as duas chaves.
 
-Conceitos:
+---
 
-for sobre lista
+## 🔹 Bloco 5 — `buscar_aluno()`
 
-Comparação ==
+**O que faz:** encontra um aluno pela matrícula.
 
-return dentro de loop (early return)
+**Conceitos:**
+- `for` sobre lista
+- Comparação `==`
+- `return` dentro de loop (early return)
+- `except (KeyError, TypeError)`
 
-except (KeyError, TypeError)
+**Código:**
 
-Código:
-
-python
+```python
 for aluno in escola["alunos"]:
     if aluno["matricula"] == matricula:
         return aluno
 return None
-Debug: se retorna None mesmo existindo, verifique se matricula é int (não string).
+```
 
-🔹 Bloco 6 — adicionar_aluno()
-O que faz: cadastra aluno (Create do CRUD).
+**Debug:** se retorna `None` mesmo existindo, verifique se `matricula` é `int` (não string).
 
-Conceitos:
+---
 
-isinstance() para tipos
+## 🔹 Bloco 6 — `adicionar_aluno()`
 
-raise TypeError / raise ValueError
+**O que faz:** cadastra aluno (Create do CRUD).
 
-try/except ativo (nós levantamos erros)
+**Conceitos:**
+- `isinstance()` para tipos
+- `raise TypeError` / `raise ValueError`
+- `try/except` **ativo** (nós levantamos erros)
+- Parâmetro com valor padrão (`idiomas=None`)
+- Validação de unicidade via `buscar_aluno`
 
-Parâmetro com valor padrão (idiomas=None)
+**Código:**
 
-Validação de unicidade via buscar_aluno
-
-Código:
-
-python
+```python
 if not isinstance(matricula, int) or matricula <= 0:
     raise TypeError("Matrícula deve ser um inteiro positivo.")
 if buscar_aluno(escola, matricula) is not None:
     raise ValueError(f"Já existe aluno com matrícula {matricula}.")
 escola["alunos"].append(novo_aluno)
-Debug: teste com matrícula string, nome vazio, idade negativa, matrícula duplicada.
+```
 
-🔹 Bloco 7 — cadastrar_nota()
-O que faz: adiciona uma nota a um idioma.
+**Debug:** teste com matrícula string, nome vazio, idade negativa, matrícula duplicada.
 
-Conceitos:
+---
 
-float() para coerção
+## 🔹 Bloco 7 — `cadastrar_nota()`
 
-setdefault(chave, []) — cria ou reutiliza a lista
+**O que faz:** adiciona uma nota a um idioma.
 
-.append() para acumular notas
+**Conceitos:**
+- `float()` para coerção
+- `setdefault(chave, [])` — cria ou reutiliza a lista
+- `.append()` para acumular notas
+- Validação de range (`0.0 <= nota <= 10.0`)
 
-Validação de range (0.0 <= nota <= 10.0)
+**Código:**
 
-Código:
-
-python
+```python
 nota = float(nota)
 aluno["boletim"].setdefault(idioma, [])
 aluno["boletim"][idioma].append(round(nota, 1))
-Debug: o setdefault é a peça-chave — testar idioma novo e idioma existente.
+```
 
-🔹 Bloco 8 — alterar_nota()
-O que faz: altera uma nota específica (por posição).
+**Debug:** o `setdefault` é a peça-chave — testar idioma novo e idioma existente.
 
-Conceitos:
+---
 
-Conversão 1-based → 0-based (posicao - 1)
+## 🔹 Bloco 8 — `alterar_nota()`
 
-Comparação encadeada (0 <= indice < len(notas))
+**O que faz:** altera uma nota específica (por posição).
 
-IndexError
+**Conceitos:**
+- **Conversão 1-based → 0-based** (`posicao - 1`)
+- Comparação encadeada (`0 <= indice < len(notas)`)
+- `IndexError`
+- **Guardar valor antigo** antes de sobrescrever
 
-Guardar valor antigo antes de sobrescrever
+**Código:**
 
-Código:
-
-python
+```python
 indice = posicao - 1
 if not (0 <= indice < len(notas)):
     raise IndexError(f"Posição {posicao} inválida. Existem {len(notas)} nota(s).")
 antiga = notas[indice]
 notas[indice] = round(nova_nota, 1)
-Debug: testar posicao=0 (não deve virar -1), posicao além do tamanho.
+```
 
-🔹 Bloco 9 — alterar_dado_cadastral()
-O que faz: altera qualquer campo cadastral (nome, nivel, idade).
+**Debug:** testar `posicao=0` (não deve virar `-1`), `posicao` além do tamanho.
 
-Conceitos:
+---
 
-set ({...}) para campos_permitidos
+## 🔹 Bloco 9 — `alterar_dado_cadastral()`
 
-Acesso dinâmico: aluno[campo] (campo é variável)
+**O que faz:** altera **qualquer** campo cadastral (nome, nivel, idade).
 
-Conversão condicional (int() só para idade)
+**Conceitos:**
+- **`set` (`{...}`)** para `campos_permitidos`
+- **Acesso dinâmico**: `aluno[campo]` (campo é variável)
+- Conversão condicional (`int()` só para idade)
+- Short-circuit com `and`
+- **Proteção contra alterar matrícula/boletim**
 
-Short-circuit com and
+**Código:**
 
-Proteção contra alterar matrícula/boletim
-
-Código:
-
-python
+```python
 campos_permitidos = {"nome", "nivel", "idade"}
 if campo not in campos_permitidos:
     raise ValueError(...)
 if campo == "idade":
     novo_valor = int(novo_valor)
 aluno[campo] = novo_valor
-Debug: tentar campo="matricula" (deve bloquear), testar todos os 3 campos válidos.
+```
 
-🔹 Bloco 10 — visualizar_aluno()
-O que faz: imprime ficha completa com boletim (Read do CRUD).
+**Debug:** tentar `campo="matricula"` (deve bloquear), testar todos os 3 campos válidos.
 
-Conceitos:
+---
 
-Repetição de string ("═" * 55)
+## 🔹 Bloco 10 — `visualizar_aluno()`
 
-Unicode de caixa (╔ ═ ║)
+**O que faz:** imprime ficha completa com boletim (Read do CRUD).
 
-.items() para iterar dicionário
+**Conceitos:**
+- **Repetição de string** (`"═" * 55`)
+- Unicode de caixa (`╔ ═ ║`)
+- **`.items()`** para iterar dicionário
+- Alinhamento `:<12`
+- Formatação `.1f`
+- Dois níveis de vazio (`if not boletim` vs `if notas`)
 
-Alinhamento :<12
+**Código:**
 
-Formatação .1f
-
-Dois níveis de vazio (if not boletim vs if notas)
-
-Código:
-
-python
+```python
 print("═" * 55)
 for idioma, notas in aluno["boletim"].items():
     if notas:
@@ -390,75 +389,75 @@ for idioma, notas in aluno["boletim"].items():
         print(f" {idioma:<12}: {notas}  |  média: {media:.1f}")
     else:
         print(f" {idioma:<12}: (sem notas cadastradas)")
-Debug: testar aluno sem boletim, aluno com idioma vazio, aluno com notas.
+```
 
-🔹 Bloco 11 — calcular_media()
-O que faz: retorna (media, situacao) para aluno/idioma.
+**Debug:** testar aluno sem boletim, aluno com idioma vazio, aluno com notas.
 
-Conceitos:
+---
 
-Retorno múltiplo em tupla (return media, situacao)
+## 🔹 Bloco 11 — `calcular_media()`
 
-Tupla sentinela (None, None) para falhas
+**O que faz:** retorna `(media, situacao)` para aluno/idioma.
 
-escola["nota_minima"] — config global
+**Conceitos:**
+- **Retorno múltiplo em tupla** (`return media, situacao`)
+- **Tupla sentinela** `(None, None)` para falhas
+- `escola["nota_minima"]` — **config global**
+- Operador ternário
+- `>=` (fronteira inclusiva)
 
-Operador ternário
+**Código:**
 
->= (fronteira inclusiva)
-
-Código:
-
-python
+```python
 media = round(sum(notas) / len(notas), 1)
 minimo = escola["nota_minima"]
 situacao = "APROVADO" if media >= minimo else "REPROVADO"
 return media, situacao
-Debug: testar media == minimo (deve aprovar), verificar se alteração na config reflete.
+```
 
-🔹 Bloco 12 — apagar_aluno()
-O que faz: remove aluno (Delete do CRUD).
+**Debug:** testar `media == minimo` (deve aprovar), verificar se alteração na config reflete.
 
-Conceitos:
+---
 
-enumerate() (índice + valor)
+## 🔹 Bloco 12 — `apagar_aluno()`
 
-.pop(indice) (remove por posição)
+**O que faz:** remove aluno (Delete do CRUD).
 
-return dentro do loop (evita bug de modificar durante iteração)
+**Conceitos:**
+- **`enumerate()`** (índice + valor)
+- **`.pop(indice)`** (remove por posição)
+- **`return` dentro do loop** (evita bug de modificar durante iteração)
+- **`raise` após o loop** (não achou)
 
-raise após o loop (não achou)
+**Código:**
 
-Código:
-
-python
+```python
 for indice, aluno in enumerate(escola["alunos"]):
     if aluno["matricula"] == matricula:
         escola["alunos"].pop(indice)
         return True
 raise KeyError(f"Aluno {matricula} não encontrado.")
-Debug: apagar 1º, do meio, último; tentar apagar inexistente.
+```
 
-🔹 Bloco 13 — analise_geral()
-O que faz: estatísticas agregadas por idioma.
+**Debug:** apagar 1º, do meio, último; tentar apagar inexistente.
 
-Conceitos:
+---
 
-Dicionário como acumulador
+## 🔹 Bloco 13 — `analise_geral()`
 
-setdefault + extend para achatar listas
+**O que faz:** estatísticas agregadas por idioma.
 
-sum(1 for x in ... if ...) (compreensão geradora)
+**Conceitos:**
+- **Dicionário como acumulador**
+- **`setdefault + extend`** para achatar listas
+- **`sum(1 for x in ... if ...)`** (compreensão geradora)
+- Cálculo de taxa (`reprovadas / total * 100`)
+- Retorno `{}` (objeto nulo) em falha
+- Duas fases: agrupar → calcular
 
-Cálculo de taxa (reprovadas / total * 100)
+**Código:**
 
-Retorno {} (objeto nulo) em falha
-
-Duas fases: agrupar → calcular
-
-Código:
-
-python
+```python
 por_idioma = {}
 for aluno in escola["alunos"]:
     for idioma, notas in aluno["boletim"].items():
@@ -469,41 +468,50 @@ for idioma, notas in por_idioma.items():
     media = round(sum(notas) / len(notas), 1)
     reprovadas = sum(1 for n in notas if n < minimo)
     taxa = round(reprovadas / len(notas) * 100, 1)
-Debug: escola vazia, alunos sem notas, notas variadas.
+```
 
-🔹 Bloco 14 — quantidade_alunos()
-O que faz: retorna len(escola["alunos"]).
+**Debug:** escola vazia, alunos sem notas, notas variadas.
 
-Conceitos:
+---
 
-len() como cálculo O(1)
+## 🔹 Bloco 14 — `quantidade_alunos()`
 
-Retorno 0 como "objeto nulo" para inteiro
+**O que faz:** retorna `len(escola["alunos"])`.
 
-Função de consulta silenciosa (não imprime)
+**Conceitos:**
+- `len()` como cálculo O(1)
+- Retorno `0` como "objeto nulo" para inteiro
+- Função de **consulta silenciosa** (não imprime)
 
-Código:
+**Código:**
 
-python
+```python
 try:
     return len(escola["alunos"])
 except (TypeError, KeyError):
     return 0
-Debug: chamar com escola = None, {}, {"alunos": [1,2,3]}.
+```
 
-🔹 Bloco 15 — Persistência (4 funções)
-O que faz: ler/gravar em arquivo TXT com backup.
+**Debug:** chamar com `escola = None`, `{}`, `{"alunos": [1,2,3]}`.
 
-Conceitos por função:
+---
 
-Função	Conceitos
-fazer_backup	os.path.exists, os.makedirs(exist_ok=True), shutil.copy2, datetime.strftime
-salvar_escola	with open("w"), f.write, \n\n, serialização manual com ;
-carregar_escola	with open("r"), for linha in f, rstrip, split, startswith, máquina de estados (secao), recursão
-criar_arquivo_modelo	Reuso de adicionar_aluno/cadastrar_nota, salvamento duplo (BD + gabarito)
-Código-chave (máquina de estados):
+## 🔹 Bloco 15 — Persistência (4 funções)
 
-python
+**O que faz:** ler/gravar em arquivo TXT com backup.
+
+**Conceitos por função:**
+
+| Função | Conceitos |
+|---|---|
+| `fazer_backup` | `os.path.exists`, `os.makedirs(exist_ok=True)`, `shutil.copy2`, `datetime.strftime` |
+| `salvar_escola` | `with open("w")`, `f.write`, `\n\n`, serialização manual com `;` |
+| `carregar_escola` | `with open("r")`, `for linha in f`, `rstrip`, `split`, `startswith`, **máquina de estados** (`secao`), **recursão** |
+| `criar_arquivo_modelo` | Reuso de `adicionar_aluno`/`cadastrar_nota`, salvamento duplo (BD + gabarito) |
+
+**Código-chave (máquina de estados):**
+
+```python
 secao = None
 for linha in f:
     linha = linha.rstrip("\n")
@@ -518,22 +526,29 @@ for linha in f:
         ...
     elif secao == "NOTAS":
         ...
-Debug: rode criar_arquivo_modelo() e abra escola.txt para verificar formato. Depois carregar_escola() e imprima.
+```
 
-🔹 Bloco 16 — Interface (13 funções)
-O que faz: menu tipo "caixa eletrônico".
+**Debug:** rode `criar_arquivo_modelo()` e abra `escola.txt` para verificar formato. Depois `carregar_escola()` e imprima.
 
-Conceitos por função:
+---
 
-Função	Conceitos
-limpar_tela	os.system, os.name, operador ternário
-exibir_cabecalho	.center(), "═" * N, f-strings com :<
-exibir_menu	Triple-quoted string, ASCII art, emojis
-pausar	input() como pausa
-fluxo_* (12)	int(input()), .strip(), .lower(), .split(","), compreensão de lista, guard clause, autenticação com dict
-Código-chave:
+## 🔹 Bloco 16 — Interface (13 funções)
 
-python
+**O que faz:** menu tipo "caixa eletrônico".
+
+**Conceitos por função:**
+
+| Função | Conceitos |
+|---|---|
+| `limpar_tela` | `os.system`, `os.name`, operador ternário |
+| `exibir_cabecalho` | `.center()`, `"═" * N`, f-strings com `:<` |
+| `exibir_menu` | Triple-quoted string, ASCII art, emojis |
+| `pausar` | `input()` como pausa |
+| `fluxo_*` (12) | `int(input())`, `.strip()`, `.lower()`, `.split(",")`, compreensão de lista, guard clause, autenticação com dict |
+
+**Código-chave:**
+
+```python
 # limpar_tela
 os.system("cls" if os.name == "nt" else "clear")
 
@@ -547,30 +562,28 @@ if confirma in ("s", "sim", "y", "yes"):
 # fluxo_configuracoes (autenticação)
 if login != CREDENCIAIS_DIRETOR["login"] or senha != CREDENCIAIS_DIRETOR["senha"]:
     return
-Debug: testar cada fluxo individualmente chamando fluxo_X(escola) no prompt Python.
+```
 
-🔹 Bloco 17 — main() + __main__
-O que faz: orquestra tudo.
+**Debug:** testar cada fluxo individualmente chamando `fluxo_X(escola)` no prompt Python.
 
-Conceitos:
+---
 
-Dispatch table (acoes = {"1": fluxo_listar, ...})
+## 🔹 Bloco 17 — `main()` + `__main__`
 
-Funções como valores (sem parênteses no dict)
+**O que faz:** orquestra tudo.
 
-lambda para opção 10
+**Conceitos:**
+- **Dispatch table** (`acoes = {"1": fluxo_listar, ...}`)
+- **Funções como valores** (sem parênteses no dict)
+- **`lambda`** para opção 10
+- **`while True` + `break`** (event loop)
+- **`try/except Exception`** como rede de segurança
+- **`if __name__ == "__main__":`** (guard)
+- Confirmação antes de salvar
 
-while True + break (event loop)
+**Código-chave:**
 
-try/except Exception como rede de segurança
-
-if __name__ == "__main__": (guard)
-
-Confirmação antes de salvar
-
-Código-chave:
-
-python
+```python
 acoes = {
     "1": fluxo_listar,
     "10": lambda e: print(f"... {quantidade_alunos(e)}"),
@@ -590,45 +603,58 @@ while True:
 
 if __name__ == "__main__":
     main()
-Debug: rodar python escola_idiomas.py e testar todas as 12 opções do menu.
+```
 
-🛠️ Roadmap de Debug — Ordem sugerida
-Execute estes testes nesta ordem para validar o sistema:
+**Debug:** rodar `python escola_idiomas.py` e testar todas as 12 opções do menu.
 
-#	Teste	O que valida
-1	print(criar_escola_vazia())	Bloco 4
-2	Adicionar 3 alunos + buscar por matrícula	Blocos 5, 6
-3	Salvar e recarregar; comparar estruturas	Bloco 15 (persistência)
-4	Rodar main() e testar opções 1, 2, 12	Blocos 16, 17
-5	Cadastrar notas em 2 idiomas, testar visualização	Blocos 7, 10
-6	Alterar nota (2ª posição) e dado cadastral	Blocos 8, 9
-7	Calcular média, testar fronteira (media == 6.0)	Bloco 11
-8	Apagar aluno e verificar que sumiu	Bloco 12
-9	Rodar análise geral com vários alunos	Bloco 13
-10	Testar opção 11 com senha errada (deve negar)	Bloco 16
-11	Testar Ctrl+C (deve interromper, não capturar)	Bloco 17
-🎯 Checklist de conceitos (para revisar antes da defesa)
-□ Listas: append, extend, pop, insert, slicing
-□ Dicionários: get, setdefault, items, keys, values, in
-□ Tuplas: retorno múltiplo, desempacotamento
-□ Sets: para verificação de pertencimento rápido
-□ Compreensão de listas e geradores
-□ lambda, map, filter, reduce (conceitual)
-□ Funções: parâmetros padrão, *args, **kwargs (conceitual)
-□ Tratamento de exceções: try/except/else/finally, raise
-□ Arquivos: open, with, modos r/w, encoding
-□ os, shutil, datetime
-□ Dispatch table
-□ if __name__ == "__main__"
-□ Arquitetura em 3 camadas
+---
 
-Esse é o seu mapa completo. Com ele você consegue:
+## 🛠️ Roadmap de Debug — Ordem sugerida
 
-- Estudar cada bloco isoladamente.
-- Debugar o código rodando testes incrementais.
-- Explicar ao professor exatamente onde cada conceito aparece e como cheguei aqui com um chinês me dando a mão ;)
+Execute estes testes **nesta ordem** para validar o sistema:
 
-Foguete não tem ré! 🚀
+| # | Teste | O que valida |
+|---|---|---|
+| 1 | `print(criar_escola_vazia())` | Bloco 4 |
+| 2 | Adicionar 3 alunos + buscar por matrícula | Blocos 5, 6 |
+| 3 | Salvar e recarregar; comparar estruturas | Bloco 15 (persistência) |
+| 4 | Rodar `main()` e testar opções 1, 2, 12 | Blocos 16, 17 |
+| 5 | Cadastrar notas em 2 idiomas, testar visualização | Blocos 7, 10 |
+| 6 | Alterar nota (2ª posição) e dado cadastral | Blocos 8, 9 |
+| 7 | Calcular média, testar fronteira (`media == 6.0`) | Bloco 11 |
+| 8 | Apagar aluno e verificar que sumiu | Bloco 12 |
+| 9 | Rodar análise geral com vários alunos | Bloco 13 |
+| 10 | Testar opção 11 com senha errada (deve negar) | Bloco 16 |
+| 11 | Testar Ctrl+C (deve interromper, não capturar) | Bloco 17 |
+
+---
+
+## 🎯 Checklist de conceitos (para revisar antes da defesa)
+
+- [ ] Listas: `append`, `extend`, `pop`, `insert`, slicing
+- [ ] Dicionários: `get`, `setdefault`, `items`, `keys`, `values`, `in`
+- [ ] Tuplas: retorno múltiplo, desempacotamento
+- [ ] Sets: para verificação de pertencimento rápido
+- [ ] Compreensão de listas e geradores
+- [ ] `lambda`, `map`, `filter`, `reduce` (conceitual)
+- [ ] Funções: parâmetros padrão, `*args`, `**kwargs` (conceitual)
+- [ ] Tratamento de exceções: `try/except/else/finally`, `raise`
+- [ ] Arquivos: `open`, `with`, modos `r`/`w`, encoding
+- [ ] `os`, `shutil`, `datetime`
+- [ ] Dispatch table
+- [ ] `if __name__ == "__main__"`
+- [ ] Arquitetura em 3 camadas
+
+---
+
+**Esse é o seu mapa completo.** Com ele você consegue:
+
+1. **Estudar** cada bloco isoladamente.
+2. **Debugar** o código rodando testes incrementais.
+3. **Explicar** ao professor exatamente **onde cada conceito aparece** e **por que**.
+
+Bom trabalho! 🚀
+[/quote]
 
 ---
 
