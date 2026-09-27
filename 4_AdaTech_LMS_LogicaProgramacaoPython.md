@@ -4,7 +4,7 @@ Logica de Programação em Python
 """
 # CAIXAVERSO - FC5 | Analista Dados - II | #1735
 
-`[https://caixaverso.ada.tech/](https://lms.ada.tech/student/topics/by-class-id/097ee233-0745-490b-b38c-1dc99dfd1305/by-module-id/4e6fa598-53f4-4856-a75d-b7e879ff1b7d)`
+https://lms.ada.tech/student/topics/by-class-id/097ee233-0745-490b-b38c-1dc99dfd1305/by-module-id/4e6fa598-53f4-4856-a75d-b7e879ff1b7d
 
 <img width="1024" height="682" alt="image" src="https://github.com/user-attachments/assets/25020c6a-0432-40a2-a039-655d14492299" />
 
