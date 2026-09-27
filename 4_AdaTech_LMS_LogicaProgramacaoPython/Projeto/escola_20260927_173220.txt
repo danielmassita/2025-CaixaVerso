@@ -1,0 +1,28 @@
+[CONFIG]
+nota_minima=6.0
+
+[ALUNOS]
+# matricula;nome;nivel;idade
+1;Ana Silva;Básico;15
+2;Carlos Souza;Intermediário;17
+3;Beatriz Lima;Avançado;20
+4;Diego Mendes;Básico;14
+5;Elena Rocha;Intermediário;18
+
+[NOTAS]
+# matricula;idioma;nota
+1;Inglês;8.5
+1;Inglês;7.0
+1;Espanhol;9.0
+2;Inglês;6.0
+2;Inglês;5.5
+2;Francês;7.5
+3;Inglês;9.5
+3;Inglês;9.0
+3;Português;10.0
+4;Espanhol;4.0
+4;Espanhol;5.0
+4;Mandarim;3.5
+5;Francês;8.0
+5;Francês;7.5
+5;Inglês;6.5
