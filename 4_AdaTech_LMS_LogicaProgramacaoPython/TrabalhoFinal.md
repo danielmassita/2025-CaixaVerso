@@ -983,3 +983,862 @@ Se quiser, no próximo passo eu:
 - Monto o **README.md** do projeto no padrão GitHub (igual fizemos com os outros).
 
 Qual desses você quer? 🚀
+
+___
+
+# 🎓 Pacote Completo — Explicação, Diagrama e README
+
+Vamos aos três, na ordem que você pediu. Cada parte foi feita para você **estudar**, não só copiar.
+
+---
+
+# PARTE 1 — Explicação linha por linha: `salvar_escola`
+
+Vou pegar a função exatamente como está no código e destrinchar cada linha. Também incluo `carregar_escola` no final porque as duas formam um **par** (uma escreve, outra lê) — entender uma ajuda a entender a outra.
+
+## 📜 Código completo da função (referência)
+
+```python
+def salvar_escola(escola, caminho=ARQUIVO_BD):
+    """
+    Grava a escola no TXT no formato de seções.
+    ANTES de gravar, faz backup do arquivo atual (se existir).
+    """
+    try:
+        if os.path.exists(caminho):
+            backup = fazer_backup(caminho)
+            if backup:
+                print(f"🗂️  Backup criado em: {backup}")
+
+        with open(caminho, "w", encoding="utf-8") as f:
+            # ---- CONFIG ----
+            f.write("[CONFIG]\n")
+            f.write(f"nota_minima={escola['nota_minima']}\n\n")
+
+            # ---- ALUNOS ----
+            f.write("[ALUNOS]\n")
+            f.write("# matricula;nome;nivel;idade\n")
+            for aluno in escola["alunos"]:
+                f.write(
+                    f"{aluno['matricula']};{aluno['nome']};"
+                    f"{aluno['nivel']};{aluno['idade']}\n"
+                )
+            f.write("\n")
+
+            # ---- NOTAS ----
+            f.write("[NOTAS]\n")
+            f.write("# matricula;idioma;nota\n")
+            for aluno in escola["alunos"]:
+                for idioma, notas in aluno["boletim"].items():
+                    for nota in notas:
+                        f.write(f"{aluno['matricula']};{idioma};{nota}\n")
+
+        print(f"💾 Escola salva em '{caminho}'.")
+        return True
+
+    except (OSError, KeyError) as erro:
+        print(f"❌ Erro ao salvar: {erro}")
+        return False
+```
+
+## 🔬 Linha por linha
+
+### Linha 1 — Assinatura da função
+
+```python
+def salvar_escola(escola, caminho=ARQUIVO_BD):
+```
+
+| Pedaço | O que é | Por quê |
+|---|---|---|
+| `def` | Palavra-chave do Python | Declara uma função |
+| `salvar_escola` | Nome da função | Verbo + substantivo: "salvar a escola" |
+| `escola` | Parâmetro obrigatório | O dicionário em memória que queremos gravar |
+| `caminho=ARQUIVO_BD` | **Parâmetro com valor padrão** | Se ninguém passar caminho, usa `"escola.txt"`. Permite salvar num caminho alternativo (ex: `salvar_escola(escola, "teste.txt")`) — muito útil para testes |
+
+> 💡 Isso é o mesmo conceito estudado no capítulo **"Parâmetros e retorno de funções"**.
+
+### Linha 2-5 — Docstring
+
+```python
+    """
+    Grava a escola no TXT no formato de seções.
+    ANTES de gravar, faz backup do arquivo atual (se existir).
+    """
+```
+
+- As três aspas (`"""`) abrem um **comentário de múltiplas linhas**.
+- Python guarda isso em `salvar_escola.__doc__`.
+- Ajuda o `help(salvar_escola)` no terminal e o autocompletar do VS Code.
+- Documenta **o que** a função faz, não **como** — isso está no corpo.
+
+### Linha 6 — Início do try
+
+```python
+    try:
+```
+
+- Tudo que pode falhar fica dentro do `try`.
+- Falhas previstas: disco cheio, arquivo sem permissão, chave `nota_minima` faltando.
+- Se algo der errado, o Python **pula direto para o `except`** no final — não trava o programa.
+
+### Linha 7-10 — Backup condicional
+
+```python
+        if os.path.exists(caminho):
+            backup = fazer_backup(caminho)
+            if backup:
+                print(f"🗂️  Backup criado em: {backup}")
+```
+
+| Linha | Explicação |
+|---|---|
+| `os.path.exists(caminho)` | Retorna `True` se o arquivo já existe |
+| `fazer_backup(caminho)` | Chama a função auxiliar (definida em outra parte do código) que **copia** o arquivo para `backups/` com timestamp |
+| `if backup:` | Se a função devolveu um caminho (não `None`), imprime |
+| `print(f"...")` | **f-string**: a variável `backup` é interpolada dentro das chaves `{}` |
+
+> ⚠️ **Ponto-chave de design**: o backup é feito **antes** do `open(..., "w")`. Se você abrir o arquivo em modo `"w"` primeiro, ele já é **truncado** (zerado) — e o backup copiaria o arquivo vazio. Ordem importa!
+
+### Linha 11 — Abrindo o arquivo com `with`
+
+```python
+        with open(caminho, "w", encoding="utf-8") as f:
+```
+
+| Pedaço | O que é |
+|---|---|
+| `open(caminho, "w", encoding="utf-8")` | Abre o arquivo. `"w"` = **write** (sobrescreve). `encoding="utf-8"` garante acentos corretos |
+| `with ... as f:` | **Gerenciador de contexto**. Fecha o arquivo automaticamente ao sair do bloco — mesmo se der erro |
+
+> 🎓 **Por que `with` e não `f = open(...)` / `f.close()`?**
+> Porque se der erro no meio, você esquece de fechar, e o arquivo fica travado no Windows. `with` resolve isso.
+> **Isso é o mesmo conceito de `finally`** estudado no capítulo de Tratamento de Exceção — mas mais elegante.
+
+### Linha 12-14 — Escrevendo a seção `[CONFIG]`
+
+```python
+            f.write("[CONFIG]\n")
+            f.write(f"nota_minima={escola['nota_minima']}\n\n")
+```
+
+- `f.write(...)` grava texto no arquivo. **Não adiciona quebra de linha sozinho** — por isso o `\n` explícito.
+- `\n` = quebra de linha (Unix). No Windows também funciona.
+- `escola['nota_minima']` acessa o valor no dicionário da escola.
+- O `\n\n` (dois) cria uma **linha em branco** entre seções — deixa o arquivo mais legível.
+
+### Linha 16-19 — Seção `[ALUNOS]` (cabeçalho)
+
+```python
+            f.write("[ALUNOS]\n")
+            f.write("# matricula;nome;nivel;idade\n")
+```
+
+- `[ALUNOS]` é o **marcador de seção** que o parser vai procurar depois.
+- A linha `# matricula;nome;nivel;idade` é um **comentário** para humanos. O parser pula linhas que começam com `#`.
+- Esse padrão é o mesmo usado em arquivos `.ini` (Windows) e `pyproject.toml`.
+
+### Linha 20-25 — Laço que escreve cada aluno
+
+```python
+            for aluno in escola["alunos"]:
+                f.write(
+                    f"{aluno['matricula']};{aluno['nome']};"
+                    f"{aluno['nivel']};{aluno['idade']}\n"
+                )
+```
+
+Destrinchando:
+
+1. `escola["alunos"]` é a **lista de dicionários** que carrega todos os alunos.
+2. `for aluno in ...` percorre cada dicionário.
+3. Dentro da f-string, montamos uma linha:
+   ```
+   "1;Ana Silva;Básico;15\n"
+   ```
+   Os campos são separados por `;` — escolhido porque **nomes raramente têm `;`** (diferente de vírgula).
+4. O `\n` fecha a linha.
+5. **A quebra de linha `f"..."` em duas strings** (`f"..."` colado em `f"..."`) é uma forma de o Python **concatenar automaticamente** strings literais adjacentes — recurso da linguagem, não é um operador `+`.
+
+> 💡 Por que **não** usamos `str(aluno)` ou `pickle` ou JSON?
+> Porque o requisito era **legível por humano**. Um arquivo `1;Ana Silva;Básico;15` qualquer pessoa entende; um JSON é mais verboso; um pickle é binário.
+
+### Linha 26 — Linha em branco após ALUNOS
+
+```python
+            f.write("\n")
+```
+
+Separa visualmente da próxima seção. O parser ignora linhas vazias.
+
+### Linha 28-32 — Seção `[NOTAS]`
+
+```python
+            f.write("[NOTAS]\n")
+            f.write("# matricula;idioma;nota\n")
+            for aluno in escola["alunos"]:
+                for idioma, notas in aluno["boletim"].items():
+                    for nota in notas:
+                        f.write(f"{aluno['matricula']};{idioma};{nota}\n")
+```
+
+**Três `for` aninhados** — o coração da normalização:
+
+| Nível | Percorre | Exemplo |
+|---|---|---|
+| 1º `for` | Cada aluno | `Ana Silva` |
+| 2º `for` | Cada idioma do boletim | `Inglês`, `Espanhol` |
+| 3º `for` | Cada nota daquele idioma | `[8.5, 7.0]` |
+
+`.items()` retorna pares `(chave, valor)` do dicionário. É a forma "pythonica" de percorrer dicionários — estudado no capítulo **Dicionários**.
+
+**Resultado no arquivo:**
+```text
+1;Inglês;8.5
+1;Inglês;7.0
+1;Espanhol;9.0
+2;Inglês;6.0
+...
+```
+
+Cada nota vira **uma linha**. Isso é o que permite calcular médias depois (é só filtrar por matrícula+idioma).
+
+### Linha 34-35 — Sucesso
+
+```python
+        print(f"💾 Escola salva em '{caminho}'.")
+        return True
+```
+
+- Fora do `with` (o arquivo já foi fechado automaticamente).
+- Retorna `True` para indicar sucesso — padrão do projeto: **toda função de escrita retorna bool**.
+
+### Linha 37-39 — Tratamento de exceção
+
+```python
+    except (OSError, KeyError) as erro:
+        print(f"❌ Erro ao salvar: {erro}")
+        return False
+```
+
+| Pedaço | Explicação |
+|---|---|
+| `except (OSError, KeyError)` | Captura **duas famílias** de erros. `OSError` = problema de arquivo/disco. `KeyError` = chave faltando no dicionário (ex: `escola['nota_minima']` se por algum motivo não existir) |
+| `as erro` | Dá um **apelido** à exceção. `erro` contém a mensagem original |
+| `print(f"...{erro}")` | Mostra a mensagem para o usuário |
+| `return False` | Sinaliza falha para quem chamou |
+
+> ⚠️ **Detalhe importante**: dentro do `except` **não re-abrimos nem re-fechamos** o arquivo. O `with` já cuidou disso, mesmo em caso de erro. Isso é o "finally disfarçado".
+
+---
+
+## 📖 Bônus — `carregar_escola` (o par inverso)
+
+```python
+def carregar_escola(caminho=ARQUIVO_BD):
+    escola = criar_escola_vazia()
+
+    try:
+        if not os.path.exists(caminho):
+            print(f"ℹ️  Arquivo '{caminho}' não encontrado. Criando modelo...")
+            criar_arquivo_modelo()
+            return carregar_escola(caminho)
+
+        secao = None
+        with open(caminho, "r", encoding="utf-8") as f:
+            for linha in f:
+                linha = linha.rstrip("\n")
+                if not linha.strip() or linha.startswith("#"):
+                    continue
+                if linha.startswith("[") and linha.endswith("]"):
+                    secao = linha.strip("[]")
+                    continue
+
+                if secao == "CONFIG":
+                    chave, valor = linha.split("=")
+                    if chave == "nota_minima":
+                        escola["nota_minima"] = float(valor)
+
+                elif secao == "ALUNOS":
+                    mat, nome, nivel, idade = linha.split(";")
+                    escola["alunos"].append({
+                        "matricula": int(mat),
+                        "nome": nome,
+                        "nivel": nivel,
+                        "idade": int(idade),
+                        "boletim": {},
+                    })
+
+                elif secao == "NOTAS":
+                    mat, idioma, nota = linha.split(";")
+                    aluno = buscar_aluno(escola, int(mat))
+                    if aluno is not None:
+                        aluno["boletim"].setdefault(idioma, []).append(float(nota))
+
+        return escola
+
+    except (OSError, ValueError, KeyError) as erro:
+        print(f"❌ Erro ao carregar '{caminho}': {erro}")
+        return criar_escola_vazia()
+```
+
+**Como ler isso em 5 passos mentais:**
+
+1. **Cria a escola vazia** — sempre parte de algo válido, mesmo se tudo falhar.
+2. **Se o arquivo não existe**: cria o modelo, chama a si mesma de novo (**recursão!**).
+3. **Abre o arquivo** e lê linha a linha.
+4. **Máquina de estados**: `secao` guarda em que bloco estamos. Cada linha é interpretada de acordo com `secao`.
+5. **Constrói o dicionário em memória** de volta, na ordem inversa do que `salvar_escola` fez.
+
+**Conceitos aqui:** `rstrip` (remove `\n` do fim), `strip("[]")` (remove colchetes), `split(";")` (divide string em lista), `setdefault` (cria chave com valor padrão se não existir), **recursão** quando o arquivo não existe.
+
+---
+
+# PARTE 2 — Diagrama ASCII do fluxo
+
+## 🗺️ Visão macro: do boot até o encerramento
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│                        BOOT DO PROGRAMA                            │
+│                                                                    │
+│   $ python escola_idiomas.py                                       │
+└───────────────────────────┬────────────────────────────────────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │   if __name__ ==     │
+                 │      "__main__":     │
+                 │      main()          │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+              ┌─────────────────────────────┐
+              │  limpar_tela()              │
+              │  escola = carregar_escola() │◄──── lê escola.txt
+              │  acoes = { ... }            │
+              └──────────┬──────────────────┘
+                         │
+                         ▼
+        ┌────────────────────────────────────────┐
+        │         LOOP PRINCIPAL (while True)    │
+        │                                        │
+        │   limpar_tela()                        │
+        │   exibir_cabecalho(escola)             │
+        │   exibir_menu()                        │
+        │   opcao = input("👉 Escolha: ")        │
+        └──────────┬─────────────────────────────┘
+                   │
+        ┌──────────┴───────────┐
+        │                      │
+        ▼                      ▼
+   opção = "0"           opção em acoes
+   ou "12"                    │
+        │                     ▼
+        │         ┌──────────────────────────┐
+        │         │  acoes[opcao](escola)    │
+        │         │  (chama a função certa)  │
+        │         └──────────┬───────────────┘
+        │                    │
+        │                    ▼
+        │         ┌──────────────────────────┐
+        │         │  pausar()                │
+        │         │  (ENTER para continuar)  │
+        │         └──────────┬───────────────┘
+        │                    │
+        └────────┬───────────┘
+                 │
+                 ▼
+        ┌────────────────────────────┐
+        │  SAI DO WHILE              │
+        │                            │
+        │  if opcao == "12":         │
+        │     salvar_escola(escola)  │
+        │  else:                     │
+        │     sair sem salvar        │
+        └──────────┬─────────────────┘
+                   │
+                   ▼
+              ┌─────────┐
+              │  FIM    │
+              └─────────┘
+```
+
+## 🎛️ Detalhe do despacho de ações (o "mapa")
+
+```text
+                         opcao (string digitada)
+                                  │
+        ┌─────────┬─────────┬─────┴─────┬─────────┬─────────┐
+        │         │         │           │         │         │
+       "1"       "2"       "3"   ...  "10"      "11"      "12"
+        │         │         │           │         │         │
+        ▼         ▼         ▼           ▼         ▼         ▼
+   fluxo_    fluxo_    fluxo_      lambda    fluxo_     None
+   listar    visual.   adicionar   print     config.
+        │         │         │           │         │         │
+        └─────────┴─────────┴───────────┴─────────┴─────────┘
+                                  │
+                                  ▼
+                    ┌───────────────────────────┐
+                    │  try:                     │
+                    │      acoes[opcao](escola) │
+                    │  except Exception as e:   │
+                    │      print("⚠️", e)       │
+                    └───────────────────────────┘
+```
+
+## 📚 Mapa das 3 camadas (arquitetura)
+
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│                     CAMADA 3 — INTERFACE (terminal)                 │
+│                                                                     │
+│   main()  exibir_menu()  exibir_cabecalho()  pausar()  limpar_tela()│
+│   fluxo_listar  fluxo_visualizar  fluxo_adicionar  fluxo_*          │
+│                                                                     │
+│   • Toda interação input()/print() acontece AQUI                    │
+│   • Não sabe COMO os dados são guardados, só chama as funções       │
+└───────────────────────────┬─────────────────────────────────────────┘
+                            │ chama
+                            ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                     CAMADA 1 — DADOS / REGRAS                       │
+│                                                                     │
+│   criar_escola_vazia   buscar_aluno   adicionar_aluno               │
+│   cadastrar_nota       alterar_nota   alterar_dado_cadastral        │
+│   visualizar_aluno     calcular_media  apagar_aluno                 │
+│   analise_geral        quantidade_alunos                            │
+│                                                                     │
+│   • Manipulam a estrutura em memória                                │
+│   • Não sabem que existe um arquivo .txt                            │
+│   • Retornam bool ou tuplas (média, situação)                       │
+└───────────────────────────┬─────────────────────────────────────────┘
+                            │ usa
+                            ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                     CAMADA 2 — PERSISTÊNCIA (TXT)                   │
+│                                                                     │
+│   salvar_escola   carregar_escola   fazer_backup   criar_arquivo_   │
+│                                                     modelo          │
+│                                                                     │
+│   • Única camada que conhece open(), shutil, os.path                │
+│   • Serializa / desserializa o dicionário em memória                │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Regra de ouro das 3 camadas:** cada camada só conversa com a de baixo, nunca com a de cima.
+
+- A interface não abre arquivo.
+- A camada de dados não imprime menu.
+- A persistência não sabe o que é "aluno" — só sabe transformar `{...}` em texto e vice-versa.
+
+## 🔄 Fluxo de dados de uma operação completa
+
+Exemplo: usuário cadastra uma nota.
+
+```text
+[USUÁRIO]
+   │ digita "4"
+   ▼
+[main()]  opcao = "4"
+   │
+   ▼
+[acoes["4"]] = fluxo_cadastrar_nota
+   │
+   ▼
+[fluxo_cadastrar_nota(escola)]
+   │ input: matricula=1, idioma="Inglês", nota=9.0
+   ▼
+[cadastrar_nota(escola, 1, "Inglês", 9.0)]
+   │ valida, adiciona à lista em memória
+   ▼
+[escola] agora tem "Inglês": [8.5, 7.0, 9.0]
+   │
+   ▼
+(volta para o menu — arquivo AINDA NÃO foi salvo)
+   │
+   ▼
+[usuário escolhe "12"]
+   │
+   ▼
+[salvar_escola(escola)]
+   │ 1. fazer_backup("escola.txt") → copia para backups/
+   │ 2. open("escola.txt", "w")
+   │ 3. escreve [CONFIG], [ALUNOS], [NOTAS]
+   ▼
+[escola.txt] atualizado no disco
+```
+
+Esse **delay** entre "operação em memória" e "gravação em disco" é o que dá a sensação de "caixa eletrônico": você faz várias coisas e no final confirma.
+
+---
+
+# PARTE 3 — README.md no padrão GitHub
+
+Salve como **`README.md`** na raiz do projeto. Está pronto para o GitHub, com badges, sumário e exemplos.
+
+````markdown
+# 🎓 Escola de Idiomas Ada — Sistema CRUD em Python
+
+> Projeto final do módulo **Lógica de Programação em Python** — curso Ada (CAIXAVERSO FC5 | Analista de Dados II | #1735).
+> Sistema de gestão de uma escola de idiomas via terminal, com persistência em arquivo TXT, backup automático e interface estilo caixa eletrônico.
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
+![Status](https://img.shields.io/badge/status-conclu%C3%ADdo-brightgreen)
+![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)
+![Sem dependências](https://img.shields.io/badge/depend%C3%AAncias-nenhuma-success)
+
+---
+
+## 📚 Sumário
+
+- [Sobre o projeto](#-sobre-o-projeto)
+- [Funcionalidades](#-funcionalidades)
+- [Estrutura do banco de dados](#-estrutura-do-banco-de-dados)
+- [Arquitetura em 3 camadas](#-arquitetura-em-3-camadas)
+- [Como rodar](#-como-rodar)
+- [Como usar (menu)](#-como-usar-menu)
+- [Exemplos de saída](#-exemplos-de-saída)
+- [Conceitos aplicados](#-conceitos-aplicados)
+- [Melhorias futuras](#-melhorias-futuras)
+- [Autor](#-autor)
+
+---
+
+## 🎯 Sobre o projeto
+
+Um sistema de linha de comando para gerenciar alunos de uma **escola de idiomas**, permitindo:
+
+- Cadastrar, consultar, atualizar e deletar (CRUD) alunos;
+- Registrar e alterar **múltiplas notas** por idioma;
+- Calcular **médias**, **situação** e **taxa de reprovação** por idioma;
+- Persistir tudo em arquivo `.txt` **legível por humanos**;
+- Fazer **backup automático** antes de qualquer gravação;
+- Restringir a alteração da nota mínima ao perfil **DIRETOR**.
+
+O projeto foi desenvolvido em ritmo de **Problem Based Learning (PBL)**, com foco em compreensão — não apenas em "fazer funcionar".
+
+---
+
+## ⚙️ Funcionalidades
+
+| # | Função | Descrição |
+|---|--------|-----------|
+| 1 | `criar_escola_vazia` | Inicializa a estrutura vazia da escola |
+| 2 | `adicionar_aluno` | Cadastra aluno com matrícula, nome, nível, idade e idiomas |
+| 3 | `cadastrar_nota` | Adiciona nota a um idioma (cria o idioma se não existir) |
+| 4 | `alterar_nota` | Altera a N-ésima nota de um idioma específico |
+| 5 | `alterar_dado_cadastral` | Altera nome, nível ou idade do aluno |
+| 6 | `visualizar_aluno` | Exibe ficha completa com boletim |
+| 7 | `calcular_media` | Retorna média + situação (aprovado/reprovado) |
+| 8 | `apagar_aluno` | Remove um aluno pelo número de matrícula |
+| 9 | `analise_geral` | Estatísticas agregadas por idioma |
+| 10 | `quantidade_alunos` | Total de alunos cadastrados |
+| ➕ | `salvar_escola` / `carregar_escola` | Persistência em TXT |
+| ➕ | `fazer_backup` | Cópia timestamped antes de sobrescrever |
+
+---
+
+## 🗄️ Estrutura do banco de dados
+
+Arquivo `escola.txt`, no formato `.ini`-like com seções:
+
+```text
+[CONFIG]
+nota_minima=6.0
+
+[ALUNOS]
+# matricula;nome;nivel;idade
+1;Ana Silva;Básico;15
+2;Carlos Souza;Intermediário;17
+...
+
+[NOTAS]
+# matricula;idioma;nota
+1;Inglês;8.5
+1;Inglês;7.0
+1;Espanhol;9.0
+...
+```
+
+### Por que esse formato?
+
+- **Legível no Bloco de Notas** — qualquer pessoa entende.
+- **Sem dependências** — sem JSON, sem pickle, sem SQLite.
+- **Fácil de parsear** — uma leitura linha a linha resolve.
+- **Extensível** — basta adicionar uma nova seção `[PROFESSORES]`.
+- **Semi-normalizado** — alunos e notas em seções separadas evitam repetição.
+
+---
+
+## 🏗️ Arquitetura em 3 camadas
+
+```text
+┌──────────────────────────────────────────────────┐
+│  CAMADA 3 — INTERFACE (terminal)                 │
+│  main(), exibir_menu(), fluxo_*                  │
+├──────────────────────────────────────────────────┤
+│  CAMADA 1 — DADOS / REGRAS                       │
+│  adicionar_aluno, calcular_media, apagar_aluno…  │
+├──────────────────────────────────────────────────┤
+│  CAMADA 2 — PERSISTÊNCIA (TXT)                   │
+│  salvar_escola, carregar_escola, fazer_backup    │
+└──────────────────────────────────────────────────┘
+```
+
+Cada camada só conversa com a de baixo:
+- A interface **não sabe** abrir arquivo.
+- A persistência **não sabe** imprimir menu.
+- Os dados **não sabem** que existe um `.txt`.
+
+---
+
+## 🚀 Como rodar
+
+### Requisitos
+- Python **3.10+** (usa f-strings e `match/case` opcional em versões futuras)
+- Nenhuma biblioteca externa
+
+### Instalação
+
+```bash
+git clone https://github.com/<seu-usuario>/escola-idiomas.git
+cd escola-idiomas
+python escola_idiomas.py
+```
+
+Na primeira execução, o programa cria automaticamente:
+- `escola.txt` — banco de dados (com **5 alunos de exemplo**)
+- `escola_modelo.txt` — cópia do gabarito, nunca sobrescrita
+- `backups/` — pasta onde os backups serão guardados
+
+---
+
+## 🖥️ Como usar (menu)
+
+```text
+╔══════════════════════════════════════════════════════════╗
+║    🎓 ESCOLA DE IDIOMAS ADA — TERMINAL DE ATENDIMENTO    ║
+╠══════════════════════════════════════════════════════════╣
+║ Nota mínima: 6.0             | Alunos: 5                 ║
+╚══════════════════════════════════════════════════════════╝
+
+ ┌──────────────────────────────────────────────────────┐
+ │  1. 📋  Listar todos os alunos                       │
+ │  2. 🔍  Visualizar aluno (boletim completo)          │
+ │  3. ➕  Adicionar aluno                              │
+ │  4. 📝  Cadastrar nota                               │
+ │  5. ✏️   Alterar nota                                │
+ │  6. 🔧  Alterar dado cadastral                       │
+ │  7. 📊  Calcular média e situação                    │
+ │  8. 🗑️   Apagar aluno                                │
+ │  9. 📈  Análise geral por idioma                     │
+ │ 10. 🔢  Quantidade de alunos                         │
+ │ 11. ⚙️   Configurações (DIRETOR)                     │
+ │ 12. 💾  Salvar e sair                                │
+ │  0. 🚪  Sair SEM salvar                              │
+ └──────────────────────────────────────────────────────┘
+```
+
+### 🔐 Acesso ao menu 11 (Configurações)
+
+```text
+Login: admin
+Senha: admin
+```
+
+Apenas o DIRETOR pode alterar a **nota mínima de aprovação**.
+
+---
+
+## 🖨️ Exemplos de saída
+
+### ➕ Adicionar aluno
+
+```text
+➕ NOVO ALUNO
+Matrícula (número inteiro): 6
+Nome completo: Fabiana Costa
+Níveis disponíveis: ['Básico', 'Intermediário', 'Avançado']
+Nível: Avançado
+Idade: 22
+Idiomas (separe por vírgula, ex: Inglês,Espanhol): Inglês,Mandarim
+✅ Aluno 'Fabiana Costa' cadastrado com sucesso.
+```
+
+### 🔍 Visualizar aluno
+
+```text
+═══════════════════════════════════════════════════════
+ 📋 FICHA DO ALUNO — MATRÍCULA 3
+═══════════════════════════════════════════════════════
+ Nome  : Beatriz Lima
+ Nível : Avançado
+ Idade : 20 anos
+───────────────────────────────────────────────────────
+ 📚 BOLETIM
+───────────────────────────────────────────────────────
+ Inglês      : [9.5, 9.0]  |  média: 9.2
+ Português   : [10.0]      |  média: 10.0
+═══════════════════════════════════════════════════════
+```
+
+### 📈 Análise geral por idioma
+
+```text
+📈 ANÁLISE GERAL POR IDIOMA
+────────────────────────────────────────────────────────────
+Idioma             Média    Reprovação    Avaliações
+────────────────────────────────────────────────────────────
+Inglês               7.5          16.7%             6
+Espanhol             6.0          33.3%             3
+Francês              7.7           0.0%             3
+Português           10.0           0.0%             1
+Mandarim             3.5         100.0%             1
+────────────────────────────────────────────────────────────
+```
+
+### 💾 Salvamento com backup automático
+
+```text
+💾 Salvar alterações no BD? (s/n): s
+🗂️  Backup criado em: backups/escola_20250101_143022.txt
+💾 Escola salva em 'escola.txt'.
+👋 Até logo!
+```
+
+---
+
+## 🧠 Conceitos aplicados
+
+| Conceito | Onde aparece |
+|----------|--------------|
+| **Variáveis e tipos primitivos** | Toda a estrutura de dados |
+| **Condicionais (`if/elif/else`)** | Menu, validações |
+| **Malhas de repetição (`while/for`)** | Menu principal, escrita do TXT |
+| **Listas** | `escola["alunos"]`, notas de cada idioma |
+| **Tuplas** | Retorno `(media, situacao)` de `calcular_media` |
+| **Dicionários** | Cada aluno, o boletim, a escola |
+| **Funções (parâmetros/retorno)** | Todas as 12 funções |
+| **Parâmetros com valor padrão** | `salvar_escola(escola, caminho=ARQUIVO_BD)` |
+| **`*args` e `**kwargs`** | Base conceitual para flexibilidade |
+| **Tratamento de exceção (`try/except/finally`)** | Toda operação de I/O e validação |
+| **`raise` de exceções** | Validações em `adicionar_aluno` |
+| **Compreensão de listas** | `sum(1 for n in notas if n < minimo)` |
+| **Funções de alta ordem (`map/filter/reduce`)** | Uso de `lambda` no menu |
+| **Persistência em arquivo** | `open`, `with`, `write`, `read` |
+| **Módulos (`os`, `shutil`, `datetime`)** | Caminhos, backup, timestamp |
+
+---
+
+## 🔮 Melhorias futuras
+
+- [ ] Adicionar seção `[PROFESSORES]` no BD
+- [ ] Exportar relatório em `.csv`
+- [ ] Filtro por nível na listagem
+- [ ] Menu de restauração de backup
+- [ ] Testes automatizados com `unittest`
+- [ ] Refatorar para **orientação a objetos** (`class Escola`, `class Aluno`)
+- [ ] Migrar persistência para **JSON** ou **SQLite**
+- [ ] Adicionar níveis CEFR completos (A1–C2) como subnível
+
+---
+
+## 🤝 Contribuindo
+
+Sugestões e PRs são bem-vindos! Abra uma *issue* descrevendo o problema ou a melhoria antes de mandar o *pull request*.
+
+---
+
+## 📄 Licença
+
+Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
+
+---
+
+## 👤 Autor
+
+**<Seu Nome>**
+- 🎓 Aluno(a) do curso **CAIXAVERSO FC5 — Analista de Dados II (#1735)**
+- 📚 Módulo: **Lógica de Programação em Python**
+- 👨‍🏫 Professor: **Thiago Tavares Magalhães**
+- 🏫 Instituição: **Ada (Let's Code)**
+
+---
+
+## 🙏 Agradecimentos
+
+- Ao professor **Thiago Tavares Magalhães** pelo material didático e pelo incentivo.
+- À **Ada** pela estrutura do curso e pelos cursos digitais complementares.
+- A você, que está lendo este README — bons estudos! 🚀
+````
+
+---
+
+# 🎁 Bônus — Checklist para subir no GitHub
+
+Quando for subir o projeto, siga essa ordem:
+
+```bash
+# 1. Crie o repositório no GitHub (sem README)
+# 2. No terminal, dentro da pasta do projeto:
+git init
+git add escola_idiomas.py README.md escola.txt escola_modelo.txt
+git commit -m "feat: sistema CRUD de escola de idiomas com persistência em TXT"
+
+# 3. Adicione um .gitignore para não subir backups locais
+echo "backups/" > .gitignore
+echo "__pycache__/" >> .gitignore
+echo "*.pyc" >> .gitignore
+git add .gitignore
+git commit -m "chore: adiciona .gitignore"
+
+# 4. Conecte ao remoto
+git remote add origin https://github.com/<seu-usuario>/escola-idiomas.git
+git branch -M main
+git push -u origin main
+```
+
+**Sugestão de estrutura final no GitHub:**
+
+```text
+📁 escola-idiomas/
+├── .gitignore
+├── LICENSE
+├── README.md
+├── escola_idiomas.py
+├── escola.txt
+└── escola_modelo.txt
+```
+
+> ⚠️ **Não suba a pasta `backups/`** — ela é local e vai crescendo. Por isso o `.gitignore` acima.
+
+---
+
+## ✅ Resumo do que foi entregue
+
+| Item | Onde |
+|---|---|
+| Explicação linha por linha de `salvar_escola` | Parte 1 |
+| Bônus: `carregar_escola` explicada | Parte 1 (final) |
+| Diagrama ASCII do `main()` | Parte 2 |
+| Diagrama do despacho de ações | Parte 2 |
+| Diagrama das 3 camadas | Parte 2 |
+| Diagrama do fluxo de dados (cadastrar nota) | Parte 2 |
+| README.md pronto para GitHub | Parte 3 |
+| Checklist de git/`.gitignore` | Bônus |
+
+---
+
+Quer que eu faça mais alguma coisa? Algumas ideias:
+
+1. **Diagrama de classes UML** antecipando a refatoração OO.
+2. **Explicação linha por linha** de `carregar_escola` ou `analise_geral` (as duas mais "densas").
+3. **Testes em `unittest`** cobrindo as 12 funções.
+4. **Versão 2.0** com `class Escola` / `class Aluno` para você comparar paradigmas.
+5. **Cartão de estudo** (cheat sheet) com todos os conceitos da conversa.
+
+Qual você quer? 🚀
+
+
