@@ -182,7 +182,6 @@ ___
 
 # PARTE 1 — Explicação linha por linha: ROADMAP DE ESTUDOS
 
-[quote]
 # 🗺️ Roadmap de Debug — `escola_idiomas.py`
 
 Guia de estudo para **depurar e entender** o código como um todo. Cada bloco é uma **estação de debug**: onde olhar, o que testar e qual conceito está em jogo.
@@ -647,14 +646,12 @@ Execute estes testes **nesta ordem** para validar o sistema:
 
 ---
 
-**Esse é o seu mapa completo.** Com ele você consegue:
+**Esse é mapa completo (ROADMPA).** Com ele é possível:
 
 1. **Estudar** cada bloco isoladamente.
 2. **Debugar** o código rodando testes incrementais.
-3. **Explicar** ao professor exatamente **onde cada conceito aparece** e **por que**.
+3. **Explicar** exatamente **onde cada conceito aparece** e **por quê**.
 
-Bom trabalho! 🚀
-[/quote]
 
 ---
 
@@ -870,5 +867,5 @@ Esse **delay** entre "operação em memória" e "gravação em disco" é o que d
 ---
 
 
-
+Nada mal pra quem estudou LETRAS! ;) Daniel Massita Tonolli
 
