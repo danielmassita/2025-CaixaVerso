@@ -279,9 +279,9 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 ## 👤 Autor
 
 **<Seu Nome>**
-- 🎓 Aluno(a) do curso **CAIXAVERSO FC5 — Analista de Dados II (#1735)**
+- 🎓 Aluno(a) **DANIEL MASSITA TONOLLI** do curso **CAIXAVERSO FC5 — Analista de Dados II (#1735)**
 - 📚 Módulo: **Lógica de Programação em Python**
-- 👨‍🏫 Professor: **Thiago Tavares Magalhães**
+- 👨‍🏫 Professor: **Thiago Tavares Magalhães** - https://www.linkedin.com/in/thiagotm/
 - 🏫 Instituição: **Ada (Let's Code)**
 
 ---
