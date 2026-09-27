@@ -291,3 +291,150 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 - Ao professor **Thiago Tavares Magalhães** pelo material didático e pelo incentivo.
 - À **Ada** pela estrutura do curso e pelos cursos digitais complementares.
 - A você, que está lendo este README — bons estudos! 🚀
+
+---
+
+## Identificação e Controle do Enunciado (DEBUG MENTAL):
+
+# 📍 Mapa do Projeto — Onde Cada Requisito Foi Atendido
+
+---
+
+## 🔹 Requisitos Gerais (itens 1, 2, 4 e 5)
+
+| Item do PDF | O que pede | Onde está no código |
+|---|---|---|
+| **1** | Alunos guardados em variável que misture **listas + dicionários** | No topo do arquivo (docstring) + função `criar_escola_vazia()` → retorna `{"alunos": [], "nota_minima": 6.0}`. A "escola" é um **dicionário** que tem uma **lista** de alunos dentro |
+| **2** | Cada aluno tem **matrícula, nome, nível, idade e boletim**; boletim guarda **disciplinas + notas** | Dentro de `adicionar_aluno()` — monta o dicionário `novo_aluno` com essas 5 chaves. O `boletim` é um **dicionário** onde cada idioma (disciplina) tem uma **lista** de notas |
+| **4** | Usar **tratamento de exceção** | Todas as funções têm `try/except`. Exemplos: `adicionar_aluno` (linha do `try`), `carregar_escola` (captura erro de arquivo), `main()` (rede de segurança) |
+| **5** | Mostrar o máximo de conhecimento | Comentários explicativos, 3 camadas (dados/persistência/interface), backup automático, menu interativo, autenticação de diretor — tudo além do que foi pedido |
+
+---
+
+## 🔹 Requisito 3 — Funções Obrigatórias (a até j)
+
+### 🅰️ `criar_escola_vazia` — Item **3a**
+
+| O que pede | O que foi feito |
+|---|---|
+| Função que inicializa a escola vazia | Função `criar_escola_vazia()` retorna `{"alunos": [], "nota_minima": 6.0}` |
+
+---
+
+### 🅱️ `adicionar_aluno` — Item **3b**
+
+| O que pede | O que foi feito |
+|---|---|
+| Cadastra aluno com **matrícula, nome, nível, idade** (obrigatórios) | Parâmetros `matricula, nome, nivel, idade` |
+| Aceita **lista de turmas** opcional (boletim sem notas) | Parâmetro `idiomas=None` — se passado, cria o boletim com `{"Inglês": [], "Espanhol": []}` |
+
+---
+
+### 🅲 `cadastrar_nota` — Item **3c**
+
+| O que pede | O que foi feito |
+|---|---|
+| Cadastra nota para aluno em disciplina | Parâmetros `matricula, idioma, nota` |
+| Permite **múltiplas notas** na mesma disciplina | Usa `.setdefault(idioma, []).append(nota)` → várias notas vão se acumulando na lista |
+
+---
+
+### 🅳 `alterar_nota` — Item **3d**
+
+| O que pede | O que foi feito |
+|---|---|
+| Altera nota específica (1ª, 2ª, 3ª...) em disciplina específica | Parâmetros `matricula, idioma, posicao, nova_nota` |
+| Conversão de "posição humana" (1, 2, 3) para índice Python (0, 1, 2) | Linha `indice = posicao - 1` |
+
+---
+
+### 🅴 `alterar_dado_cadastral` — Item **3e**
+
+| O que pede | O que foi feito |
+|---|---|
+| Altera dado cadastral (nome, nível ou idade) | Parâmetros `matricula, campo, novo_valor` |
+| Valida o campo alterado (só permite nome/nivel/idade) | `campos_permitidos = {"nome", "nivel", "idade"}` |
+| Atribuição dinâmica da chave | `aluno[campo] = novo_valor` — funciona para qualquer campo |
+
+---
+
+### 🅵 `visualizar_aluno` — Item **3f**
+
+| O que pede | O que foi feito |
+|---|---|
+| Mostra **todos** os dados de um aluno | Imprime ficha formatada com bordas ASCII: nome, nível, idade e boletim completo (com médias por idioma) |
+
+---
+
+### 🅶 `calcular_media` — Item **3g**
+
+| O que pede | O que foi feito |
+|---|---|
+| Retorna **média** e **situação** (aprovado/reprovado) | `return media, situacao` — retorno múltiplo em **tupla** |
+| Recebe matrícula, disciplina e **nota mínima** | Parâmetros `matricula, idioma` — a nota mínima é lida de `escola["nota_minima"]` |
+
+---
+
+### 🅷 `apagar_aluno` — Item **3h**
+
+| O que pede | O que foi feito |
+|---|---|
+| Apaga aluno pela matrícula | Parâmetro `matricula` |
+| Respeita a estrutura | Usa `enumerate` + `.pop(indice)` para remover o dicionário da lista |
+
+---
+
+### 🅸 `analise_geral` — Item **3i**
+
+| O que pede | O que foi feito |
+|---|---|
+| Retorna **taxa de reprovação**, **média** e **quantidade de avaliações** por disciplina | Retorna dicionário `{idioma: {"media": X, "taxa_reprovacao": Y, "quantidade_avaliacoes": Z}}` |
+| Agrega de todos os alunos | Percorre `escola["alunos"]` → `aluno["boletim"]` → notas, agrupando por idioma |
+
+---
+
+### 🅹 `quantidade_alunos` — Item **3j**
+
+| O que pede | O que foi feito |
+|---|---|
+| Retorna quantos alunos existem na escola | `return len(escola["alunos"])` — uma linha |
+
+---
+
+## 🔹 Recursos Extras (além do pedido)
+
+| Recurso | Onde está | Por que foi incluído |
+|---|---|---|
+| **Persistência em TXT** | `salvar_escola`, `carregar_escola` | Simula um banco de dados real |
+| **Backup automático** | `fazer_backup` | Segurança antes de sobrescrever |
+| **Arquivo modelo** | `criar_arquivo_modelo` | Gabarito com 5 alunos de exemplo |
+| **Menu interativo** | `main()` + `exibir_menu` | Simula terminal de caixa eletrônico |
+| **12 fluxos de UI** | `fluxo_listar`, `fluxo_adicionar`, ... | Separam input/print da lógica |
+| **Autenticação de diretor** | `fluxo_configuracoes` | Só "admin/admin" altera a nota mínima |
+| **Camadas bem separadas** | Dados / Persistência / Interface | Boa arquitetura |
+
+---
+
+## 🎯 Resumo em 1 frase por item
+
+| Item | Frase |
+|---|---|
+| **1** | Escola = dicionário com lista de alunos dentro ✅ |
+| **2** | Aluno = dicionário com `matricula, nome, nivel, idade, boletim` ✅ |
+| **3a** | `criar_escola_vazia()` ✅ |
+| **3b** | `adicionar_aluno()` com `idiomas` opcional ✅ |
+| **3c** | `cadastrar_nota()` com múltiplas notas por disciplina ✅ |
+| **3d** | `alterar_nota()` por posição (1ª, 2ª, 3ª...) ✅ |
+| **3e** | `alterar_dado_cadastral()` genérica ✅ |
+| **3f** | `visualizar_aluno()` com ficha ASCII ✅ |
+| **3g** | `calcular_media()` retorna tupla `(média, situação)` ✅ |
+| **3h** | `apagar_aluno()` com `pop` ✅ |
+| **3i** | `analise_geral()` com taxa/média/quantidade ✅ |
+| **3j** | `quantidade_alunos()` com `len` ✅ |
+| **4** | Tratamento de exceção em todas as funções ✅ |
+| **5** | Extras: TXT, backup, menu, autenticação ✅ |
+
+---
+
+## 📋 Fim Checklist para Entrega
+
