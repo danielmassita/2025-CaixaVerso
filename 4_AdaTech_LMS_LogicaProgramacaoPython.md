@@ -9,8 +9,8 @@ https://lms.ada.tech/student/topics/by-class-id/097ee233-0745-490b-b38c-1dc99dfd
 <img width="1024" height="682" alt="image" src="https://github.com/user-attachments/assets/25020c6a-0432-40a2-a039-655d14492299" />
 
 
-- Professor: [](https://www.linkedin.com/in/daniel-massita-tonolli/)
-  - SR Data Alumni
+- Professor: [Thiago Tavares Magalhães](https://www.linkedin.com/in/thiagotm/)
+  - Senior Data Scientist at SuperSim | Teacher at Ada | Master's Degree in Computational Modeling from the National Laboratory for Scientific Computing
 
 
 
