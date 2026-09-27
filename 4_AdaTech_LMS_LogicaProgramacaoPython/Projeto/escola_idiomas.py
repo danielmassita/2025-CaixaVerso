@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 ================================================================================
- ESCOLA DE IDIOMAS — Sistema CRUD via Terminal
+ ESCOLA DE IDIOMAS ADA — Sistema CRUD via Terminal
 ================================================================================
- Autor  : (seu nome)
- Curso  : Ada — Lógica de Programação em Python
- Projeto: Banco de dados de alunos de uma escola de idiomas
+ Aluno(a): <seu nome>
+ Curso   : CAIXAVERSO FC5 — Analista de Dados II (#1735)
+ Módulo  : Lógica de Programação em Python
+ Professor: Thiago Tavares Magalhães
+ Instituição: Ada (Let's Code)
 --------------------------------------------------------------------------------
  OBJETIVO
  --------
- Criar, consultar, atualizar e deletar (CRUD) um banco de alunos de uma
- escola de idiomas, com persistência em arquivo .txt, interface de
- terminal estilo "caixa eletrônico" e backup automático antes de alterar.
+ Gerenciar alunos de uma escola de idiomas com operações de CRUD
+ (Create, Read, Update, Delete), persistência em arquivo TXT,
+ backup automático e interface de terminal estilo "caixa eletrônico".
 
  ESTRUTURA DE DADOS (em memória)
  -------------------------------
@@ -22,12 +24,11 @@
              "nome": "Ana Silva",
              "nivel": "Básico",
              "idade": 15,
-             "boletim": {                    # idioma -> lista de notas
+             "boletim": {                # idioma -> lista de notas
                  "Inglês":   [8.5, 7.0],
                  "Espanhol": [9.0],
              },
          },
-         ...
      ],
      "nota_minima": 6.0,
  }
@@ -35,16 +36,15 @@
  POR QUE ESSA ESTRUTURA?
  -----------------------
  - Dicionário no topo  -> permite guardar configurações junto com os dados.
- - "alunos" é uma LISTA -> preserva a ordem de cadastro, fácil de percorrer.
- - Cada aluno é um DICIONÁRIO -> acesso por chave é legível (aluno["nome"]).
- - "boletim" é DICIONÁRIO -> cada idioma tem sua própria LISTA de notas,
-   permitindo múltiplas notas por idioma (ex: prova, trabalho, recuperação).
+ - "alunos" é LISTA    -> preserva ordem de cadastro, fácil de percorrer.
+ - Cada aluno é DICT   -> acesso por chave é legível (aluno["nome"]).
+ - "boletim" é DICT    -> cada idioma tem sua LISTA de notas (múltiplas provas).
 
- CAMADAS DO CÓDIGO (arquitetura em 3 níveis)
- -------------------------------------------
- 1) DADOS        -> funções que manipulam a estrutura em memória
- 2) PERSISTÊNCIA -> ler/gravar o arquivo .txt e fazer backups
- 3) INTERFACE    -> menus, inputs e prints no terminal
+ ARQUITETURA EM 3 CAMADAS
+ ------------------------
+ 1) DADOS         -> manipula a estrutura em memória
+ 2) PERSISTÊNCIA  -> lê/grava o arquivo .txt e faz backups
+ 3) INTERFACE     -> menus, inputs e prints no terminal
 
  AUTORIZAÇÃO
  -----------
@@ -57,28 +57,25 @@ import os
 import shutil
 from datetime import datetime
 
+
 # ============================================================================
 # CONSTANTES GLOBAIS
 # ============================================================================
-# Documentação antecipada: todas as "regras" do domínio ficam aqui em cima,
-# para que qualquer ajuste futuro (novo idioma, novo nível, etc.) seja feito
-# em um único lugar.
-# ============================================================================
 
-ARQUIVO_BD      = "escola.txt"           # banco de dados "de trabalho"
-ARQUIVO_MODELO  = "escola_modelo.txt"    # cópia de segurança do modelo exemplo
-PASTA_BACKUP    = "backups"              # onde os backups automáticos vão
+ARQUIVO_BD     = "escola.txt"           # banco de dados "de trabalho"
+ARQUIVO_MODELO = "escola_modelo.txt"    # gabarito, nunca sobrescrito
+PASTA_BACKUP   = "backups"              # onde os backups automáticos vão
 
 IDIOMAS_VALIDOS = ["Português", "Inglês", "Francês", "Espanhol", "Mandarim"]
 
-# Níveis -> subníveis CEFR (só documental; a validação usa as chaves)
+# Níveis -> subníveis CEFR (referência documental; a validação usa as chaves)
 NIVEIS_VALIDOS = {
     "Básico":        ["A1", "A2"],
     "Intermediário": ["B1", "B2"],
     "Avançado":      ["C1", "C2"],
 }
 
-NOTA_MINIMA_PADRAO = 6.0
+NOTA_MINIMA_PADRAO  = 6.0
 CREDENCIAIS_DIRETOR = {"login": "admin", "senha": "admin"}
 
 
@@ -93,10 +90,6 @@ def criar_escola_vazia():
 
     Retorno:
         dict: {"alunos": [], "nota_minima": 6.0}
-
-    Por que um dicionário no topo e não só uma lista?
-    -> Porque queremos guardar configurações (nota_minima) junto com os dados,
-       sem precisar de variáveis globais espalhadas pelo código.
     """
     return {
         "alunos": [],
@@ -108,9 +101,6 @@ def buscar_aluno(escola, matricula):
     """
     Função auxiliar (não pedida explicitamente, mas evita repetição).
     Retorna o dicionário do aluno com a matrícula dada, ou None.
-
-    Aqui já mostramos o padrão de tratamento: qualquer erro inesperado
-    cai no except e retorna None (falha silenciosa para uso interno).
     """
     try:
         for aluno in escola["alunos"]:
@@ -135,14 +125,10 @@ def adicionar_aluno(escola, matricula, nome, nivel, idade, idiomas=None):
 
     Retorno:
         True se cadastrou, False se falhou.
-
-    Validações demonstram try/except + raise:
-    - ValueError  -> dado semanticamente inválido (nome vazio, idade negativa)
-    - TypeError   -> tipo errado (matrícula como string, por ex.)
     """
     try:
         # --- Validações de tipo e valor ---
-        if not isinstance(matricula, int) or matricula <= 0:
+        if not isinstance(matricula, int) or isinstance(matricula, bool) or matricula <= 0:
             raise TypeError("Matrícula deve ser um inteiro positivo.")
         if not isinstance(nome, str) or not nome.strip():
             raise ValueError("Nome não pode ser vazio.")
@@ -150,7 +136,7 @@ def adicionar_aluno(escola, matricula, nome, nivel, idade, idiomas=None):
             raise ValueError(
                 f"Nível inválido. Use um de: {list(NIVEIS_VALIDOS.keys())}"
             )
-        if not isinstance(idade, int) or idade <= 0:
+        if not isinstance(idade, int) or isinstance(idade, bool) or idade <= 0:
             raise ValueError("Idade deve ser um inteiro positivo.")
 
         # --- Regra de unicidade ---
@@ -163,7 +149,7 @@ def adicionar_aluno(escola, matricula, nome, nivel, idade, idiomas=None):
             for idioma in idiomas:
                 if idioma not in IDIOMAS_VALIDOS:
                     raise ValueError(f"Idioma inválido: {idioma}")
-                boletim[idioma] = []      # lista de notas vazia
+                boletim[idioma] = []
 
         # --- Monta o dicionário do aluno ---
         novo_aluno = {
@@ -175,11 +161,10 @@ def adicionar_aluno(escola, matricula, nome, nivel, idade, idiomas=None):
         }
         escola["alunos"].append(novo_aluno)
 
-        print(f"✅ Aluno '{nome}' cadastrado com sucesso.")
+        print(f"✅ Aluno '{nome.strip()}' cadastrado com sucesso.")
         return True
 
     except (TypeError, ValueError) as erro:
-        # Demonstração explícita do tratamento: qualquer erro de validação cai aqui.
         print(f"❌ Erro ao adicionar aluno: {erro}")
         return False
 
@@ -203,11 +188,11 @@ def cadastrar_nota(escola, matricula, idioma, nota):
         if not (0.0 <= nota <= 10.0):
             raise ValueError("Nota deve estar entre 0.0 e 10.0.")
 
-        # Cria a lista se o idioma for novo
+        # setdefault garante que a lista exista (cria se for novo, preserva se já houver)
         aluno["boletim"].setdefault(idioma, [])
         aluno["boletim"][idioma].append(round(nota, 1))
 
-        print(f"✅ Nota {nota} cadastrada em '{idioma}' para {aluno['nome']}.")
+        print(f"✅ Nota {round(nota, 1)} cadastrada em '{idioma}' para {aluno['nome']}.")
         return True
 
     except (KeyError, ValueError, TypeError) as erro:
@@ -240,12 +225,12 @@ def alterar_nota(escola, matricula, idioma, posicao, nova_nota):
                 f"Posição {posicao} inválida. Existem {len(notas)} nota(s)."
             )
 
-        nova_nota = float(nova_nota)
+        nova_nota = round(float(nova_nota), 1)
         if not (0.0 <= nova_nota <= 10.0):
             raise ValueError("Nova nota deve estar entre 0.0 e 10.0.")
 
         antiga = notas[indice]
-        notas[indice] = round(nova_nota, 1)
+        notas[indice] = nova_nota
 
         print(f"✅ Nota {posicao} de '{idioma}' alterada: {antiga} → {nova_nota}")
         return True
@@ -266,19 +251,27 @@ def alterar_dado_cadastral(escola, matricula, campo, novo_valor):
         if aluno is None:
             raise KeyError(f"Aluno {matricula} não encontrado.")
 
+        # set (não list!) porque só queremos testar pertencimento rápido
         campos_permitidos = {"nome", "nivel", "idade"}
         if campo not in campos_permitidos:
             raise ValueError(
                 f"Campo inválido. Permitidos: {sorted(campos_permitidos)}"
             )
 
-        if campo == "idade":
+        # Validações por tipo de campo
+        if campo == "nome":
+            if not isinstance(novo_valor, str) or not novo_valor.strip():
+                raise ValueError("Nome deve ser uma string não vazia.")
+            novo_valor = novo_valor.strip()
+        elif campo == "idade":
             novo_valor = int(novo_valor)
             if novo_valor <= 0:
                 raise ValueError("Idade deve ser positiva.")
-        if campo == "nivel" and novo_valor not in NIVEIS_VALIDOS:
-            raise ValueError(f"Nível inválido: {novo_valor}")
+        elif campo == "nivel":
+            if novo_valor not in NIVEIS_VALIDOS:
+                raise ValueError(f"Nível inválido: {novo_valor}")
 
+        # Atribuição dinâmica — a chave `campo` vira o índice do dicionário
         antigo = aluno[campo]
         aluno[campo] = novo_valor
         print(f"✅ {campo} de {aluno['nome']} alterado: '{antigo}' → '{novo_valor}'")
@@ -315,8 +308,8 @@ def visualizar_aluno(escola, matricula):
         else:
             for idioma, notas in aluno["boletim"].items():
                 if notas:
-                    medias = sum(notas) / len(notas)
-                    print(f" {idioma:<12}: {notas}  |  média: {medias:.1f}")
+                    media = sum(notas) / len(notas)
+                    print(f" {idioma:<12}: {notas}  |  média: {media:.1f}")
                 else:
                     print(f" {idioma:<12}: (sem notas cadastradas)")
         print("═" * 55 + "\n")
@@ -360,7 +353,7 @@ def apagar_aluno(escola, matricula):
     """
     (Requisito 3h)
     Remove o aluno da escola. Retorna True/False.
-    Demonstra o uso de enumerate + pop.
+    Usa enumerate + pop.
     """
     try:
         for indice, aluno in enumerate(escola["alunos"]):
@@ -386,22 +379,21 @@ def analise_geral(escola):
           }, ...
         }
 
-    Aqui usamos CONCEITOS FUNCIONAIS:
-    - dicionário como acumulador
-    - reduce não é necessário aqui, mas usamos compreensão de listas
+    Aplica conceitos funcionais: dicionário como acumulador,
+    compreensão geradora para contagem com filtro.
     """
     try:
         if not escola["alunos"]:
             raise ValueError("Escola vazia.")
 
-        # 1) Agrupa todas as notas por idioma
+        # ---- Fase 1: agrupar todas as notas por idioma ----
         por_idioma = {}
         for aluno in escola["alunos"]:
             for idioma, notas in aluno["boletim"].items():
                 if notas:
                     por_idioma.setdefault(idioma, []).extend(notas)
 
-        # 2) Calcula métricas
+        # ---- Fase 2: calcular métricas ----
         minimo = escola["nota_minima"]
         resultado = {}
         for idioma, notas in por_idioma.items():
@@ -436,6 +428,9 @@ def fazer_backup(caminho_origem):
     """
     Cria uma cópia timestamped do arquivo antes de sobrescrever.
     Backup fica em ./backups/escola_AAAAMMDD_HHMMSS.txt
+
+    Retorno:
+        str com o caminho do backup, ou None se não havia o que copiar.
     """
     try:
         if not os.path.exists(caminho_origem):
@@ -454,6 +449,9 @@ def salvar_escola(escola, caminho=ARQUIVO_BD):
     """
     Grava a escola no TXT no formato de seções.
     ANTES de gravar, faz backup do arquivo atual (se existir).
+
+    Parâmetro `caminho` tem valor padrão — permite salvar em arquivo
+    alternativo (usado por criar_arquivo_modelo).
     """
     try:
         if os.path.exists(caminho):
@@ -495,7 +493,7 @@ def salvar_escola(escola, caminho=ARQUIVO_BD):
 def carregar_escola(caminho=ARQUIVO_BD):
     """
     Lê o TXT e reconstrói a estrutura em memória.
-    Se o arquivo não existir, cria a escola vazia E o arquivo modelo.
+    Se o arquivo não existir, cria o arquivo modelo e recarrega (recursão).
     """
     escola = criar_escola_vazia()
 
@@ -503,14 +501,16 @@ def carregar_escola(caminho=ARQUIVO_BD):
         if not os.path.exists(caminho):
             print(f"ℹ️  Arquivo '{caminho}' não encontrado. Criando modelo...")
             criar_arquivo_modelo()
-            return carregar_escola(caminho)
+            return carregar_escola(caminho)   # recursão: agora existe
 
         secao = None
         with open(caminho, "r", encoding="utf-8") as f:
             for linha in f:
                 linha = linha.rstrip("\n")
+                # Pula linhas vazias e comentários
                 if not linha.strip() or linha.startswith("#"):
                     continue
+                # Detecta marcador de seção
                 if linha.startswith("[") and linha.endswith("]"):
                     secao = linha.strip("[]")
                     continue
@@ -546,19 +546,19 @@ def carregar_escola(caminho=ARQUIVO_BD):
 def criar_arquivo_modelo():
     """
     Cria o arquivo modelo com 5 alunos de exemplo.
-    Esse arquivo NUNCA é sobrescrito pelo uso normal — ele é o 'gabarito'
+    Esse arquivo NUNCA é sobrescrito pelo uso normal — é o 'gabarito'
     para o usuário entender a estrutura do banco.
     """
     escola = criar_escola_vazia()
 
-    # 5 alunos de exemplo — propositalmente com desempenhos variados
+    # 5 alunos com perfis variados (níveis, idades, idiomas)
     adicionar_aluno(escola, 1, "Ana Silva",     "Básico",        15, ["Inglês", "Espanhol"])
     adicionar_aluno(escola, 2, "Carlos Souza",  "Intermediário", 17, ["Inglês", "Francês"])
     adicionar_aluno(escola, 3, "Beatriz Lima",  "Avançado",      20, ["Inglês", "Português"])
     adicionar_aluno(escola, 4, "Diego Mendes",  "Básico",        14, ["Espanhol", "Mandarim"])
     adicionar_aluno(escola, 5, "Elena Rocha",   "Intermediário", 18, ["Francês", "Inglês"])
 
-    # Notas de exemplo
+    # Notas variadas (inclui reprovações e notas altas)
     notas = [
         (1, "Inglês", 8.5), (1, "Inglês", 7.0), (1, "Espanhol", 9.0),
         (2, "Inglês", 6.0), (2, "Inglês", 5.5), (2, "Francês", 7.5),
@@ -569,14 +569,14 @@ def criar_arquivo_modelo():
     for mat, idioma, nota in notas:
         cadastrar_nota(escola, mat, idioma, nota)
 
-    # Grava em disco (o modelo também gera backup do antigo, se houver)
+    # Salva no BD principal E no arquivo modelo (o gabarito)
     salvar_escola(escola, ARQUIVO_BD)
     salvar_escola(escola, ARQUIVO_MODELO)
     print("📦 Arquivo modelo criado com 5 alunos de exemplo.")
 
 
 # ============================================================================
-# CAMADA 3 — INTERFACE (terminal estilo ATM)
+# CAMADA 3 — INTERFACE (terminal)
 # ============================================================================
 
 def limpar_tela():
@@ -586,12 +586,17 @@ def limpar_tela():
 
 def exibir_cabecalho(escola):
     """Cabeçalho fixo com nome da escola e nota mínima atual."""
-    print("╔" + "═" * 58 + "╗")
-    print("║" + " 🎓 ESCOLA DE IDIOMAS ADA — TERMINAL DE ATENDIMENTO ".center(58) + "║")
-    print("╠" + "═" * 58 + "╣")
-    print(f"║ Nota mínima de aprovação: {escola['nota_minima']:<4} "
-          f"| Alunos: {quantidade_alunos(escola):<26} ║")
-    print("╚" + "═" * 58 + "╝")
+    largura = 58
+    print("╔" + "═" * largura + "╗")
+    print("║" + " 🎓 ESCOLA DE IDIOMAS ADA — TERMINAL DE ATENDIMENTO ".center(largura) + "║")
+    print("╠" + "═" * largura + "╣")
+
+    nota_txt = f"{escola['nota_minima']:.1f}"
+    total_txt = str(quantidade_alunos(escola))
+    # Linha de infos: alinhamento manual para caber dentro da caixa
+    info = f" Nota mínima: {nota_txt}   |   Alunos cadastrados: {total_txt}"
+    print("║" + info.ljust(largura) + "║")
+    print("╚" + "═" * largura + "╝")
 
 
 def exibir_menu():
@@ -602,13 +607,13 @@ def exibir_menu():
  │  2. 🔍  Visualizar aluno (boletim completo)          │
  │  3. ➕  Adicionar aluno                              │
  │  4. 📝  Cadastrar nota                               │
- │  5. ✏️   Alterar nota                                │
+ │  5. ✏️   Alterar nota                                 │
  │  6. 🔧  Alterar dado cadastral                       │
  │  7. 📊  Calcular média e situação                    │
- │  8. 🗑️   Apagar aluno                                │
+ │  8. 🗑️   Apagar aluno                                 │
  │  9. 📈  Análise geral por idioma                     │
  │ 10. 🔢  Quantidade de alunos                         │
- │ 11. ⚙️   Configurações (DIRETOR)                     │
+ │ 11. ⚙️   Configurações (DIRETOR)                      │
  │ 12. 💾  Salvar e sair                                │
  │  0. 🚪  Sair SEM salvar                              │
  └──────────────────────────────────────────────────────┘""")
@@ -619,14 +624,17 @@ def pausar():
     input("\n↩️  Pressione ENTER para continuar...")
 
 
-# --- Fluxos por opção (aqui fica a "cola" de input/print) -------------------
+# --- Fluxos por opção -----------------------------------------------------
 
 def fluxo_listar(escola):
     print("\n📋 LISTA DE ALUNOS")
     print("-" * 55)
-    for a in escola["alunos"]:
-        print(f" [{a['matricula']:>3}] {a['nome']:<20} "
-              f"{a['nivel']:<14} {a['idade']} anos")
+    if not escola["alunos"]:
+        print(" (nenhum aluno cadastrado)")
+    else:
+        for a in escola["alunos"]:
+            print(f" [{a['matricula']:>3}] {a['nome']:<20} "
+                  f"{a['nivel']:<14} {a['idade']} anos")
     print("-" * 55)
 
 
@@ -642,7 +650,8 @@ def fluxo_adicionar(escola):
     print(f"Níveis disponíveis: {list(NIVEIS_VALIDOS.keys())}")
     nivel = input("Nível: ").strip()
     idade = int(input("Idade: "))
-    idiomas_txt = input(f"Idiomas (separe por vírgula, ex: Inglês,Espanhol): ")
+    idiomas_txt = input("Idiomas (separe por vírgula, ex: Inglês,Espanhol): ")
+    # Limpa a lista: divide, remove espaços, descarta vazios
     idiomas = [i.strip() for i in idiomas_txt.split(",") if i.strip()]
     adicionar_aluno(escola, mat, nome, nivel, idade, idiomas)
 
@@ -684,8 +693,8 @@ def fluxo_calcular_media(escola):
 def fluxo_apagar(escola):
     print("\n🗑️  APAGAR ALUNO")
     mat = int(input("Matrícula: "))
-    confirma = input(f"Confirma apagar matrícula {mat}? (s/n): ").lower()
-    if confirma == "s":
+    confirma = input(f"Confirma apagar matrícula {mat}? (s/n): ").strip().lower()
+    if confirma in ("s", "sim", "y", "yes"):
         apagar_aluno(escola, mat)
     else:
         print("Operação cancelada.")
@@ -715,7 +724,8 @@ def fluxo_configuracoes(escola):
     login = input("Login: ").strip()
     senha = input("Senha: ").strip()
 
-    if login != CREDENCIAIS_DIRETOR["login"] or senha != CREDENCIAIS_DIRETOR["senha"]:
+    if (login != CREDENCIAIS_DIRETOR["login"] or
+            senha != CREDENCIAIS_DIRETOR["senha"]):
         print("🚫 Credenciais inválidas. Acesso negado.")
         return
 
@@ -731,7 +741,7 @@ def fluxo_configuracoes(escola):
 
 
 # ============================================================================
-# MAIN — laço principal
+# MAIN — orquestrador
 # ============================================================================
 
 def main():
@@ -742,7 +752,8 @@ def main():
     limpar_tela()
     escola = carregar_escola()
 
-    # Mapa: número -> função que executa o fluxo
+    # Tabela de despacho: número do menu -> função do fluxo
+    # (funções SEM parênteses = referência, não chamada)
     acoes = {
         "1":  fluxo_listar,
         "2":  fluxo_visualizar,
@@ -755,10 +766,10 @@ def main():
         "9":  fluxo_analise,
         "10": lambda e: print(f"\n🔢 Total de alunos: {quantidade_alunos(e)}"),
         "11": fluxo_configuracoes,
-        "12": None,   # sair salvando
-        "0":  None,   # sair sem salvar
+        # 12 e 0 tratados antes do despacho (saída)
     }
 
+    opcao = ""
     while True:
         limpar_tela()
         exibir_cabecalho(escola)
@@ -772,7 +783,8 @@ def main():
             try:
                 acoes[opcao](escola)
             except Exception as erro:
-                # Captura qualquer coisa inesperada para o terminal não travar
+                # Rede de segurança: captura qualquer coisa inesperada
+                # para o terminal não travar. NÃO captura Ctrl+C.
                 print(f"⚠️  Erro inesperado: {erro}")
         else:
             print("❌ Opção inválida.")
@@ -781,8 +793,8 @@ def main():
 
     # ---------------- Saída ----------------
     if opcao == "12":
-        confirma = input("\n💾 Salvar alterações no BD? (s/n): ").lower()
-        if confirma == "s":
+        confirma = input("\n💾 Salvar alterações no BD? (s/n): ").strip().lower()
+        if confirma in ("s", "sim", "y", "yes"):
             salvar_escola(escola)
             print("👋 Até logo!")
         else:
