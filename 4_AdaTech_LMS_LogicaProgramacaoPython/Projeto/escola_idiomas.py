@@ -1,13 +1,15 @@
+# TRABALHO ADA 1735 - Daniel Massita Tonolli
+
 # -*- coding: utf-8 -*-
 """
 ================================================================================
  ESCOLA DE IDIOMAS ADA — Sistema CRUD via Terminal
 ================================================================================
- Aluno(a): <seu nome>
+ Aluno(a): DANIEL MASSITA TONOLLI
  Curso   : CAIXAVERSO FC5 — Analista de Dados II (#1735)
  Módulo  : Lógica de Programação em Python
  Professor: Thiago Tavares Magalhães
- Instituição: Ada (Let's Code)
+ Instituição: LMS Ada (Let's Code) - Caixa Verso
 --------------------------------------------------------------------------------
  OBJETIVO
  --------
