@@ -385,6 +385,10 @@ Isso nos permite executar o comando `git log --all --graph --decorate --color --
 
 
 
+___
+
+
+
 - Aula 1 -
   - Gravação: https://drive.google.com/file/d/1_sOBEE81shIV_nrUO7gBzWCgnWGxEGAY/view?usp=drive_web
   - Resumo: https://docs.google.com/document/d/1F_TQqtfpHLBPMk_Jtgj4SVmZXj-Odf0fBBiE-bEQ-rI/edit?tab=t.klaz9yr45b1
