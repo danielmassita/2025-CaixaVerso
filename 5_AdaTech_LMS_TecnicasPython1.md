@@ -396,6 +396,6 @@ ___
   -   ```  ```
 
 - Aula 2 -
-  -   Gravação: ...
-  -   Resumo: ...
+  -   Gravação: https://drive.google.com/file/d/1XQlE7vfCDFWXqldAVyShdy6eN3GZKBNS/view
+  -   Resumo: https://docs.google.com/document/d/1A4U3NxE-2od3oIQL35sWSTHBMPTZrhJTA97DM-ZDoE8/edit?tab=t.r5tpzzj39eei
   -   ``` asdf asdf ```
